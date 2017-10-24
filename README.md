@@ -3,11 +3,12 @@
 I started this project to make it easier for my team and I to change Network Locations deployed by group policy.
 
 Each Network Location requires four policy items in three categories
-- 2 IniFile settings
-- 1 Folder setting
-- 1 Shortcut setting
+- 2 IniFile settings (User Configuration>Preferences>Windows Settings>IniFiles)
+- 1 Folder setting (User Configuration>Preferences>Windows Settings>Folders)
+- 1 Shortcut setting (User Configuration>Preferences>Windows Settings>Shortcuts)
 
 In order to use this program you must create at least one setting for each of these using the group policy management console for your desired policy object, otherwise the settings made here will not be reflected in the policy.
+
 
 If you have any questions, suggestion, tips, or contributions please let me know.
 
