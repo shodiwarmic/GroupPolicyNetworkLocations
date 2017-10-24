@@ -13,3 +13,5 @@ In order to use this program you must create at least one setting for each of th
 If you have any questions, suggestion, tips, or contributions please let me know.
 
 You can see more about Network Locations here: http://bartdesmet.net/blogs/bart/archive/2005/09/23/3554.aspx
+
+Inspiration for this application was found here: https://community.spiceworks.com/topic/681289-how-get-unc-network-drive-to-appear-under-computer-in-windows-explorer
