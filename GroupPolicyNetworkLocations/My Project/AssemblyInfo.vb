@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("GroupPolicyNetworkLocations")>
-<Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("")>
-<Assembly: AssemblyProduct("GroupPolicyNetworkLocations")>
+<Assembly: AssemblyTitle("Group Policy Network Locations Editor")>
+<Assembly: AssemblyDescription("Edits the XML files need to add network locations to domain joined computers using group policy.")>
+<Assembly: AssemblyCompany("Jonathan Perry - Norwich Public School")>
+<Assembly: AssemblyProduct("Group Policy Network Locations Editor")>
 <Assembly: AssemblyCopyright("Copyright ©  2017")>
 <Assembly: AssemblyTrademark("")>
 
