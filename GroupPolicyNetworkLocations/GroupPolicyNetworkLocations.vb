@@ -90,11 +90,11 @@ Public Class GroupPolicyNetworkLocations
 
     ' Use the Active Directory domain that the computer is joined to
     Dim objDomain As ActiveDirectory.Domain = ActiveDirectory.Domain.GetComputerDomain()
-    Dim strDomainName As String = ActiveDirectory.Domain.GetComputerDomain().Name
+    Dim strDomainName As String = objDomain.Name
 
     Dim regUserSettings As RegistryKey
     Dim XMLIniFiles, XMLFolders, XMLShortcuts As New XmlDocument()
-    Dim tableNetworkLocations, tableFilterGroups, tableGroupPolcies As New DataTable()
+    Dim tableNetworkLocations, tableFilterGroups, tableGroupPolicies As New DataTable()
     Dim ADPicker As New DirectoryObjectPickerDialog
     Dim changesSaved As Boolean = True
     Dim strGPUID, strGPPath, strIniFilesXML, strFoldersXML, strShortcutsXML As String
@@ -189,11 +189,11 @@ Public Class GroupPolicyNetworkLocations
         tableFilterGroups.Columns.Add(column)
 
         ' Creates a data table that looks something like this for storing a list of Group Policy Objects in the domain
-        ' ---------------------------------
-        ' |   PolicyGUID    | Policy Name |
-        ' |-----------------|-------------|
-        ' | * Unique String |   String    |
-        ' ---------------------------------
+        ' -----------------------------------------------------------------------------------
+        ' |   PolicyGUID    | PolicyName | IniFilesExists | FoldersExists | ShortcutsExists |
+        ' |-----------------|------------|----------------|---------------|-----------------|
+        ' | * Unique String |   String   |    Boolean     |    Boolean    |     Boolean     |
+        ' -----------------------------------------------------------------------------------
 
 
         column = New DataColumn()
@@ -201,14 +201,35 @@ Public Class GroupPolicyNetworkLocations
         column.ColumnName = "PolicyGUID"
         column.ReadOnly = False
         column.Unique = True
-        tableGroupPolcies.Columns.Add(column)
+        tableGroupPolicies.Columns.Add(column)
 
         column = New DataColumn()
         column.DataType = System.Type.GetType("System.String")
         column.ColumnName = "PolicyName"
         column.ReadOnly = False
         column.Unique = False
-        tableGroupPolcies.Columns.Add(column)
+        tableGroupPolicies.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.Boolean")
+        column.ColumnName = "IniFilesExists"
+        column.ReadOnly = False
+        column.Unique = False
+        tableGroupPolicies.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.Boolean")
+        column.ColumnName = "FoldersExists"
+        column.ReadOnly = False
+        column.Unique = False
+        tableGroupPolicies.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.Boolean")
+        column.ColumnName = "ShortcutsExists"
+        column.ReadOnly = False
+        column.Unique = False
+        tableGroupPolicies.Columns.Add(column)
 
         ' Temporary primary key column
         Dim PrimaryKeyColumns(0) As DataColumn
@@ -218,8 +239,8 @@ Public Class GroupPolicyNetworkLocations
         tableNetworkLocations.PrimaryKey = PrimaryKeyColumns
 
         ' Set primary key to PolicyGUID for Group Policy table
-        PrimaryKeyColumns(0) = tableGroupPolcies.Columns("PolicyGUID")
-        tableGroupPolcies.PrimaryKey = PrimaryKeyColumns
+        PrimaryKeyColumns(0) = tableGroupPolicies.Columns("PolicyGUID")
+        tableGroupPolicies.PrimaryKey = PrimaryKeyColumns
     End Sub
 
     Private Sub RefreshView()
@@ -264,8 +285,11 @@ Public Class GroupPolicyNetworkLocations
     End Sub
 
     Private Sub LaunchSettings()
+        ' Check if policies have changed
+        RefreshPolicyList()
+
         ' Set the settings dropdown list to show the found policy names, but return the guid of the selected policy
-        DialogSettings.ComboBoxGroupPolicies.DataSource = tableGroupPolcies
+        DialogSettings.ComboBoxGroupPolicies.DataSource = tableGroupPolicies
         DialogSettings.ComboBoxGroupPolicies.DisplayMember = "PolicyName"
         DialogSettings.ComboBoxGroupPolicies.ValueMember = "PolicyGUID"
 
@@ -282,7 +306,7 @@ Public Class GroupPolicyNetworkLocations
             regUserSettings.SetValue("GPUID", strGPUID)
 
             ' Set the Policy Name and GUID text boxes on the main form
-            TextBoxPolicyName.Text = tableGroupPolcies.Select(String.Format("PolicyGUID = '{0}'", strGPUID))(0)("PolicyName")
+            TextBoxPolicyName.Text = tableGroupPolicies.Select(String.Format("PolicyGUID = '{0}'", strGPUID))(0)("PolicyName")
             TextBoxPolicyGUID.Text = strGPUID
 
             ' Load the policy preferences from the XML Files
@@ -565,6 +589,35 @@ Public Class GroupPolicyNetworkLocations
 
     End Sub
 
+    Private Sub RefreshPolicyList()
+        ' Remove any old polices from the table
+        tableGroupPolicies.Clear()
+
+        ' Populate the group policy table with all group policies in the domain
+        Using searcher = New DirectorySearcher(objDomain.GetDirectoryEntry, "(&(objectClass=groupPolicyContainer))", {"displayName", "name"}, SearchScope.Subtree)
+            Dim results As SearchResultCollection = searcher.FindAll
+            For Each result As SearchResult In results
+                Dim directoryEntry As DirectoryEntry = result.GetDirectoryEntry
+                Dim row As DataRow
+                Try
+                    row = tableGroupPolicies.Select(String.Format("PolicyGUID = '{0}'", directoryEntry.Properties("name").Value))(0)
+                Catch
+                    row = tableGroupPolicies.NewRow
+                    Dim strTempGPPath As String = "\\" + strDomainName + "\SYSVOL\" + strDomainName + "\Policies\" + directoryEntry.Properties("name").Value + "\User\Preferences"
+                    row("PolicyGUID") = directoryEntry.Properties("name").Value
+                    row("PolicyName") = directoryEntry.Properties("displayName").Value
+                    ' Check if the needed group policy settings files already exist
+                    row("IniFilesExists") = File.Exists(strTempGPPath + "\IniFiles\IniFiles.xml")
+                    row("FoldersExists") = File.Exists(strTempGPPath + "\Folders\Folders.xml")
+                    row("ShortcutsExists") = File.Exists(strTempGPPath + "\Shortcuts\Shortcuts.xml")
+                    tableGroupPolicies.Rows.Add(row)
+                End Try
+            Next
+        End Using
+
+        tableGroupPolicies.DefaultView.RowFilter = "IniFilesExists = TRUE AND FoldersExists = TRUE AND ShortcutsExists = TRUE"
+    End Sub
+
     Private Sub GroupPolicyNetworkLocations_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If Not changesSaved Then
             ' Ask if they really want to quit, their changes haven't been saved
@@ -584,22 +637,8 @@ Public Class GroupPolicyNetworkLocations
         ' Create the data tables
         MakeDataTables()
 
-        ' Populate the group policy table with all group policies in the domain
-        Using searcher = New DirectorySearcher(ActiveDirectory.Domain.GetComputerDomain().GetDirectoryEntry, "(&(objectClass=groupPolicyContainer))", {"displayName", "name"}, SearchScope.Subtree)
-            Dim results As SearchResultCollection = searcher.FindAll
-            For Each result As SearchResult In results
-                Dim directoryEntry As DirectoryEntry = result.GetDirectoryEntry
-                Dim row As DataRow
-                Try
-                    row = tableGroupPolcies.Select(String.Format("PolicyGUID = '{0}'", directoryEntry.Properties("name").Value))(0)
-                Catch
-                    row = tableGroupPolcies.NewRow
-                    row("PolicyGUID") = directoryEntry.Properties("name").Value
-                    row("PolicyName") = directoryEntry.Properties("displayName").Value
-                    tableGroupPolcies.Rows.Add(row)
-                End Try
-            Next
-        End Using
+        ' Load list of all policies in domain
+        RefreshPolicyList()
 
         ' Open the registry settings for the application
         regUserSettings = Registry.CurrentUser.OpenSubKey("Software\GroupPolicyNetworkLocations", True)
@@ -612,7 +651,7 @@ Public Class GroupPolicyNetworkLocations
                 ' Attempt to set the current policy guid from the registry
                 strGPUID = regUserSettings.GetValue("GPUID").ToString()
                 strGPPath = "\\" + strDomainName + "\SYSVOL\" + strDomainName + "\Policies\" + strGPUID + "\User\Preferences"
-                TextBoxPolicyName.Text = tableGroupPolcies.Select(String.Format("PolicyGUID = '{0}'", strGPUID))(0)("PolicyName")
+                TextBoxPolicyName.Text = tableGroupPolicies.Select(String.Format("PolicyGUID = '{0}'", strGPUID))(0)("PolicyName")
                 TextBoxPolicyGUID.Text = strGPUID
             Catch
             End Try
