@@ -13,7 +13,13 @@ Public Class DialogSettings
     End Sub
 
     Private Sub ComboBoxGroupPolicies_SelectedValueChanged(sender As Object, e As EventArgs) Handles ComboBoxGroupPolicies.SelectedValueChanged
-        If ComboBoxGroupPolicies.SelectedValue.ToString <> Nothing Then TextBoxGroupPolicyUID.Text = ComboBoxGroupPolicies.SelectedValue.ToString
+        Try
+            If ComboBoxGroupPolicies.SelectedValue.GetType = System.Type.GetType("System.String") Then
+                TextBoxGroupPolicyUID.Text = ComboBoxGroupPolicies.SelectedValue.ToString
+            End If
+        Catch
+            TextBoxGroupPolicyUID.Clear()
+        End Try
     End Sub
 
 End Class
