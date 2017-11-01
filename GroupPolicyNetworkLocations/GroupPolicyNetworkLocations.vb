@@ -574,6 +574,7 @@ Public Class GroupPolicyNetworkLocations
         Next
 
         ' Set listbox source
+        tableNetworkLocations.DefaultView.Sort = "ShareName ASC"
         ListBoxShareNames.DataSource = tableNetworkLocations
         ListBoxShareNames.DisplayMember = "ShareName"
         ListBoxShareNames.ValueMember = "ShareName"
@@ -616,6 +617,7 @@ Public Class GroupPolicyNetworkLocations
         End Using
 
         tableGroupPolicies.DefaultView.RowFilter = "IniFilesExists = TRUE AND FoldersExists = TRUE AND ShortcutsExists = TRUE"
+        tableGroupPolicies.DefaultView.Sort = "PolicyName ASC"
     End Sub
 
     Private Sub GroupPolicyNetworkLocations_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
