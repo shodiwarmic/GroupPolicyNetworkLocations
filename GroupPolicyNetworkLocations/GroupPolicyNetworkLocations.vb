@@ -733,8 +733,7 @@ Public Class GroupPolicyNetworkLocations
                 Dim newSharePath As String = DialogNewShare.TextBoxSharePath.Text
                 If newShareName.Trim.Length > 0 And newSharePath.Trim.Length > 0 Then
                     ' Only add if Share Name and Path are populated with non-blank strings
-                    Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", newShareName))
-                    If rows.Count > 0 Then
+                    If tableNetworkLocations.Select(String.Format("ShareName = '{0}'", newShareName)).Count > 0 Then
                         If Not MsgBox("A share with this name already exists." + vbCrLf + "Would you like to try again?", MessageBoxButtons.YesNoCancel) = DialogResult.Yes Then
                             ' No pressed, don't show the dialog again
                             boolRetry = False
@@ -891,9 +890,8 @@ Public Class GroupPolicyNetworkLocations
         Dim groupRow As DataRow = tableFilterGroups.Select(String.Format("ShareName = '{0}' And GroupName = '{1}' And GroupSID = '{2}'", strShareName, strGroupName, strGroupSID))(0)
         ' Remove group from table
         tableFilterGroups.Rows.Remove(groupRow)
-        Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
         ' Update share modified time
-        rows(0)("LastModified") = Now
+        tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0)("LastModified") = Now
         changesSaved = False
     End Sub
 
