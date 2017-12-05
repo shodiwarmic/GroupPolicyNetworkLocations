@@ -350,30 +350,32 @@ Public Class GroupPolicyNetworkLocations
                                                    ShortcutPropPid1, ShortcutPropTargetType, SharePropAction, ShortcutPropComment, ShortcutPropShortcutKey, ShortcutPropStartIn, ShortcutPropArguments, ShortcutPropIconIndex, shareRow("ShareTarget"), ShortcutPropIconPath, ShortcutPropWindow, ShortcutPropShortcutPath1, shareRow("ShareName"), ShortcutPropShortcutPath3))
 
             ' Group for filters.
-            ' TODO: Maybe check to see if there are any filters before just throwing them in there...
-            sbIniFilesXML.AppendLine("    <Filters>")
-            sbFoldersXML.AppendLine("    <Filters>")
-            sbShortcutsXML.AppendLine("    <Filters>")
 
-            Dim i As Integer = 1 ' A counter, even though I only need to know which is the first
-            For Each groupRow In tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName")))
-                Dim strBool As String = "AND"
-                If i > 1 Then strBool = FilterGroupBool ' The first filter is always AND
-                ' Create a string, because all of them get the same thing
-                Dim strFilterGroup As String = String.Format("      <FilterGroup bool=""{0}"" not=""{1}"" name=""{2}"" sid=""{3}"" userContext=""{4}"" primaryGroup=""{5}"" localGroup=""{6}""/>",
-                                                             strBool, FilterGroupNot, groupRow("GroupName"), groupRow("GroupSID"), FilterGroupUserContext, FilterGroupPrimaryGroup, FilterGroupLocalGroup)
-                ' Write it to all of them
-                sbIniFilesXML.AppendLine(strFilterGroup)
-                sbFoldersXML.AppendLine(strFilterGroup)
-                sbShortcutsXML.AppendLine(strFilterGroup)
+            If tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName"))).Count() > 0 Then
+                sbIniFilesXML.AppendLine("    <Filters>")
+                sbFoldersXML.AppendLine("    <Filters>")
+                sbShortcutsXML.AppendLine("    <Filters>")
 
-                i += 1 ' Increase the counter
-            Next
+                Dim i As Integer = 1 ' A counter, even though I only need to know which is the first
+                For Each groupRow In tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName")))
+                    Dim strBool As String = "AND"
+                    If i > 1 Then strBool = FilterGroupBool ' The first filter is always AND
+                    ' Create a string, because all of them get the same thing
+                    Dim strFilterGroup As String = String.Format("      <FilterGroup bool=""{0}"" not=""{1}"" name=""{2}"" sid=""{3}"" userContext=""{4}"" primaryGroup=""{5}"" localGroup=""{6}""/>",
+                                                                 strBool, FilterGroupNot, groupRow("GroupName"), groupRow("GroupSID"), FilterGroupUserContext, FilterGroupPrimaryGroup, FilterGroupLocalGroup)
+                    ' Write it to all of them
+                    sbIniFilesXML.AppendLine(strFilterGroup)
+                    sbFoldersXML.AppendLine(strFilterGroup)
+                    sbShortcutsXML.AppendLine(strFilterGroup)
 
-            ' Close filter group
-            sbIniFilesXML.AppendLine("    </Filters>")
-            sbFoldersXML.AppendLine("    </Filters>")
-            sbShortcutsXML.AppendLine("    </Filters>")
+                    i += 1 ' Increase the counter
+                Next
+
+                ' Close filter group
+                sbIniFilesXML.AppendLine("    </Filters>")
+                sbFoldersXML.AppendLine("    </Filters>")
+                sbShortcutsXML.AppendLine("    </Filters>")
+            End If
 
             ' close the groups
             sbIniFilesXML.AppendLine("  </Ini>")
@@ -385,17 +387,21 @@ Public Class GroupPolicyNetworkLocations
                                                        IniClsid, Ini2Name, Ini2Status, ShareImage, shareRow("LastModified"), shareRow("Ini2UID"), ShareUserContext, ShareBypassErrors))
             sbIniFilesXML.AppendLine(String.Format("    <Properties path=""{0}{1}{2}"" section=""{3}"" value=""{4}"" property=""{5}"" action=""{6}""/>",
                                                IniPropPath1, shareRow("ShareName"), IniPropPath3, IniPropSection, Ini2PropValue, Ini2PropProperty, SharePropAction))
-            sbIniFilesXML.AppendLine("    <Filters>")
-            i = 1
-            For Each groupRow In tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName")))
-                Dim strBool As String = "AND"
-                If i > 1 Then strBool = "OR"
-                Dim strFilterGroup As String = String.Format("      <FilterGroup bool=""{0}"" not=""0"" name=""{1}"" sid=""{2}"" userContext=""1"" primaryGroup=""0"" localGroup=""0""/>",
-                                                             strBool, groupRow("GroupName"), groupRow("GroupSID"))
-                sbIniFilesXML.AppendLine(strFilterGroup)
-                i += 1
-            Next
-            sbIniFilesXML.AppendLine("    </Filters>")
+
+            If tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName"))).Count() > 0 Then
+                sbIniFilesXML.AppendLine("    <Filters>")
+                Dim i As Integer = 1 ' A counter, even though I only need to know which is the first
+                For Each groupRow In tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName")))
+                    Dim strBool As String = "AND"
+                    If i > 1 Then strBool = "OR"
+                    Dim strFilterGroup As String = String.Format("      <FilterGroup bool=""{0}"" not=""0"" name=""{1}"" sid=""{2}"" userContext=""1"" primaryGroup=""0"" localGroup=""0""/>",
+                                                                 strBool, groupRow("GroupName"), groupRow("GroupSID"))
+                    sbIniFilesXML.AppendLine(strFilterGroup)
+                    i += 1
+                Next
+                sbIniFilesXML.AppendLine("    </Filters>")
+            End If
+
             sbIniFilesXML.AppendLine("  </Ini>")
         Next
 
