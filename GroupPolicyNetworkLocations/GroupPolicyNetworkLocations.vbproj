@@ -25,7 +25,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.1.0.0</ApplicationVersion>
+    <ApplicationVersion>1.2.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -88,9 +88,13 @@
     <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ActiveDirectoryObjectPicker, Version=2.2.128.0, Culture=neutral, PublicKeyToken=515ab092c8839750, processorArchitecture=MSIL">
-      <HintPath>..\packages\Tulpep.ActiveDirectoryObjectPicker.2.2.128\lib\net452\ActiveDirectoryObjectPicker.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="ActiveDirectoryObjectPicker, Version=2.2.129.0, Culture=neutral, PublicKeyToken=515ab092c8839750, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Tulpep.ActiveDirectoryObjectPicker.2.2.129\lib\net452\ActiveDirectoryObjectPicker.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="plist-cil, Version=1.16.0.0, Culture=neutral, PublicKeyToken=ec2cb9e1a719933d, processorArchitecture=MSIL">
+      <HintPath>..\packages\plist-cil.1.16.0\lib\net45\plist-cil.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -125,6 +129,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="DialogAddOption.Designer.vb">
+      <DependentUpon>DialogAddOption.vb</DependentUpon>
+    </Compile>
+    <Compile Include="DialogAddOption.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="DialogNewShare.Designer.vb">
       <DependentUpon>DialogNewShare.vb</DependentUpon>
     </Compile>
@@ -164,6 +174,9 @@
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DialogAddOption.resx">
+      <DependentUpon>DialogAddOption.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DialogNewShare.resx">
       <DependentUpon>DialogNewShare.vb</DependentUpon>
     </EmbeddedResource>
@@ -200,6 +213,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GPOAdmin_518.ico" />
+    <None Include="Resources\plist-cil.dll" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
