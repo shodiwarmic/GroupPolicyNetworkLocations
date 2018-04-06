@@ -5,6 +5,7 @@ Imports Tulpep.ActiveDirectoryObjectPicker
 Imports System.Text
 Imports System.IO
 Imports Microsoft.Win32
+Imports Claunia.PropertyList
 
 Public Class GroupPolicyNetworkLocations
 
@@ -94,10 +95,16 @@ Public Class GroupPolicyNetworkLocations
 
     Dim regUserSettings As RegistryKey
     Dim XMLIniFiles, XMLFolders, XMLShortcuts As New XmlDocument()
-    Dim tableNetworkLocations, tableFilterGroups, tableGroupPolicies As New DataTable()
-    Dim ADPicker As New DirectoryObjectPickerDialog
+    Dim tableNetworkLocations, tableFilterGroups, tableGroupPolicies, tableMountOptions As New DataTable()
+    Friend ADPicker As New DirectoryObjectPickerDialog
     Dim changesSaved As Boolean = True
+    Dim boolHomeAutoMount, boolDefaultsAutoMount, boolDefaultsConnectedOnly As Boolean
     Dim strGPUID, strGPPath, strIniFilesXML, strFoldersXML, strShortcutsXML As String
+    Dim arrDefaultsOptions, arrHomeOptions, arrHomeGroups As New ArrayList
+
+    Private Function ConvertToSMB(strFilePath As String) As String
+        Return "smb:" + strFilePath.Replace("\", "/")
+    End Function
 
     Private Sub MakeDataTables()
 
@@ -105,11 +112,11 @@ Public Class GroupPolicyNetworkLocations
         Dim column As DataColumn
 
         ' Creates a data table that looks something like this for storing variables related to the share folders
-        ' -------------------------------------------------------------------------------------------------
-        ' |    ShareName    | ShareTarget | Last Modified | Ini1UID | Ini2UID | FoldersUID | ShortcutsUID |
-        ' |-----------------|-------------|---------------|---------|---------|------------|--------------|
-        ' | * Unique String |   String    |   DateTime    | String  | String  |   String   |    String    |
-        ' -------------------------------------------------------------------------------------------------
+        ' -----------------------------------------------------------------------------------------------------------------------------
+        ' |    ShareName    | ShareTarget | Last Modified | Ini1UID | Ini2UID | FoldersUID | ShortcutsUID | AutoMount | ConnectedOnly |
+        ' |-----------------|-------------|---------------|---------|---------|------------|--------------|-----------|---------------|
+        ' | * Unique String |   String    |   DateTime    | String  | String  |   String   |    String    |  Boolean  |    Boolean    |
+        ' -----------------------------------------------------------------------------------------------------------------------------
 
         column = New DataColumn()
         column.DataType = System.Type.GetType("System.String")
@@ -159,6 +166,49 @@ Public Class GroupPolicyNetworkLocations
         column.ReadOnly = False
         column.Unique = False
         tableNetworkLocations.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.Boolean")
+        column.ColumnName = "UseNoMADDefaults"
+        column.ReadOnly = False
+        column.Unique = False
+        column.DefaultValue = True
+        tableNetworkLocations.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.Boolean")
+        column.ColumnName = "AutoMount"
+        column.ReadOnly = False
+        column.Unique = False
+        tableNetworkLocations.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.Boolean")
+        column.ColumnName = "ConnectedOnly"
+        column.ReadOnly = False
+        column.Unique = False
+        tableNetworkLocations.Columns.Add(column)
+
+        ' Creates a data table that looks something like this for storing Share folder and Mount option connections
+        ' ----------------------
+        ' | ShareName | Option |
+        ' |-----------|--------|
+        ' |  String   | String |
+        ' ----------------------
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.String")
+        column.ColumnName = "ShareName"
+        column.ReadOnly = False
+        column.Unique = False
+        tableMountOptions.Columns.Add(column)
+
+        column = New DataColumn()
+        column.DataType = System.Type.GetType("System.String")
+        column.ColumnName = "Option"
+        column.ReadOnly = False
+        column.Unique = False
+        tableMountOptions.Columns.Add(column)
 
         ' Creates a data table that looks something like this for storing Share folder and Filter Group connections
         ' ------------------------------------
@@ -246,13 +296,11 @@ Public Class GroupPolicyNetworkLocations
     Private Sub RefreshView()
         If ListBoxShareNames.SelectedItems.Count <> 1 Or tableNetworkLocations.Rows.Count = 0 Then
             ' Clear all fields if there is not ONLY ONE item selected, or if there are no items available to select
-            TextBoxIni1UID.Clear()
-            TextBoxIni2UID.Clear()
-            TextBoxFoldersUID.Clear()
-            TextBoxShortcutsUID.Clear()
             TextBoxLastModified.Clear()
             TextBoxLocationName.Clear()
             TextBoxTargetPath.Clear()
+            CheckBoxAutoMount.Checked = False
+            CheckBoxConnectedOnly.Checked = False
             ' Then quit trying to update the view, there's nothing to update from
             Exit Sub
         End If
@@ -265,22 +313,29 @@ Public Class GroupPolicyNetworkLocations
         Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
         If rows.Count > 0 Then
             ' If a row is found set the form fields based on the values in that row
-            TextBoxIni1UID.Text = rows(0)("Ini1UID").ToString
-            TextBoxIni2UID.Text = rows(0)("Ini2UID").ToString
-            TextBoxFoldersUID.Text = rows(0)("FoldersUID").ToString
-            TextBoxShortcutsUID.Text = rows(0)("ShortcutsUID").ToString
             TextBoxLastModified.Text = rows(0)("LastModified").ToString
             TextBoxLocationName.Text = rows(0)("ShareName").ToString
             TextBoxTargetPath.Text = rows(0)("ShareTarget").ToString
+            CheckBoxUseNoMADDefaults.Checked = rows(0)("UseNoMADDefaults")
+            If rows(0)("UseNoMADDefaults") Then
+                ListBoxOptions.DataSource = Nothing
+                NoMADDefaultsEval()
+            Else
+                If rows(0)("AutoMount").GetType Is GetType(DBNull) Then rows(0)("AutoMount") = boolDefaultsAutoMount
+                If rows(0)("ConnectedOnly").GetType Is GetType(DBNull) Then rows(0)("ConnectedOnly") = boolDefaultsConnectedOnly
+                CheckBoxAutoMount.Checked = rows(0)("AutoMount")
+                CheckBoxConnectedOnly.Checked = rows(0)("ConnectedOnly")
+            End If
+
         Else
             ' If no row is found, blank the form fields
-            TextBoxIni1UID.Clear()
-            TextBoxIni2UID.Clear()
-            TextBoxFoldersUID.Clear()
-            TextBoxShortcutsUID.Clear()
             TextBoxLastModified.Clear()
             TextBoxLocationName.Clear()
             TextBoxTargetPath.Clear()
+            CheckBoxUseNoMADDefaults.Checked = False
+            CheckBoxAutoMount.Checked = False
+            CheckBoxConnectedOnly.Checked = False
+            ListBoxOptions.DataSource = Nothing
         End If
     End Sub
 
@@ -293,6 +348,24 @@ Public Class GroupPolicyNetworkLocations
         DialogSettings.ComboBoxGroupPolicies.DisplayMember = "PolicyName"
         DialogSettings.ComboBoxGroupPolicies.ValueMember = "PolicyGUID"
 
+        DialogSettings.CheckBoxNoMADHomeShareAutoMount.Checked = boolHomeAutoMount
+        DialogSettings.CheckBoxNoMADDefaultsAutoMount.Checked = boolDefaultsAutoMount
+        DialogSettings.CheckBoxNoMADDefaultsConnectedOnly.Checked = boolDefaultsConnectedOnly
+
+        DialogSettings.ListBoxNoMADDefaultsOptions.Items.Clear()
+        DialogSettings.ListBoxNoMADDefaultsOptions.Items.AddRange(arrDefaultsOptions.ToArray)
+
+        DialogSettings.ListBoxNoMADHomeSharesOptions.Items.Clear()
+        DialogSettings.ListBoxNoMADHomeSharesOptions.Items.AddRange(arrHomeOptions.ToArray)
+
+        Try
+            DialogSettings.CheckBoxAllGroups.Checked = arrHomeGroups.Item(0).Equals("All")
+        Catch
+            DialogSettings.CheckBoxAllGroups.Checked = False
+        End Try
+        DialogSettings.ListBoxNoMADHomeSharesGroups.Items.Clear()
+        DialogSettings.ListBoxNoMADHomeSharesGroups.Items.AddRange(arrHomeGroups.ToArray)
+
         ' Preselect the current policy, if there is one
         If strGPUID <> Nothing And strGPUID <> String.Empty Then DialogSettings.ComboBoxGroupPolicies.SelectedValue = strGPUID
 
@@ -301,9 +374,34 @@ Public Class GroupPolicyNetworkLocations
 
             strGPUID = DialogSettings.ComboBoxGroupPolicies.SelectedValue
             strGPPath = "\\" + strDomainName + "\SYSVOL\" + strDomainName + "\Policies\" + strGPUID + "\User\Preferences"
+            boolHomeAutoMount = DialogSettings.CheckBoxNoMADHomeShareAutoMount.Checked
+            boolDefaultsAutoMount = DialogSettings.CheckBoxNoMADDefaultsAutoMount.Checked
+            boolDefaultsConnectedOnly = DialogSettings.CheckBoxNoMADDefaultsConnectedOnly.Checked
+
+            arrDefaultsOptions.Clear()
+            For Each objDefaultsOption In DialogSettings.ListBoxNoMADDefaultsOptions.Items
+                arrDefaultsOptions.Add(objDefaultsOption.ToString())
+            Next
+
+            arrHomeOptions.Clear()
+            For Each objHomeOption In DialogSettings.ListBoxNoMADHomeSharesOptions.Items
+                arrHomeOptions.Add(objHomeOption.ToString())
+            Next
+
+            arrHomeGroups.Clear()
+            For Each objHomeGroup In DialogSettings.ListBoxNoMADHomeSharesGroups.Items
+                arrHomeGroups.Add(objHomeGroup.ToString())
+            Next
 
             ' Save this to the registry for the next time the program is openned
             regUserSettings.SetValue("GPUID", strGPUID)
+            regUserSettings.SetValue("HomeAutoMount", boolHomeAutoMount)
+            regUserSettings.SetValue("DefaultsAutoMount", boolDefaultsAutoMount)
+            regUserSettings.SetValue("DefaultsConnectedOnly", boolDefaultsConnectedOnly)
+            regUserSettings.SetValue("DefaultsOptions", arrDefaultsOptions.ToArray(GetType(String)))
+            regUserSettings.SetValue("HomeOptions", arrHomeOptions.ToArray(GetType(String)))
+            regUserSettings.SetValue("HomeGroups", arrHomeGroups.ToArray(GetType(String)))
+
 
             ' Set the Policy Name and GUID text boxes on the main form
             TextBoxPolicyName.Text = tableGroupPolicies.Select(String.Format("PolicyGUID = '{0}'", strGPUID))(0)("PolicyName")
@@ -626,6 +724,29 @@ Public Class GroupPolicyNetworkLocations
         tableGroupPolicies.DefaultView.Sort = "PolicyName ASC"
     End Sub
 
+    Private Sub NoMADDefaultsEval()
+        ButtonAddOption.Enabled = Not CheckBoxUseNoMADDefaults.Checked
+        ButtonDeleteOption.Enabled = Not CheckBoxUseNoMADDefaults.Checked
+        CheckBoxAutoMount.Enabled = Not CheckBoxUseNoMADDefaults.Checked
+        CheckBoxConnectedOnly.Enabled = Not CheckBoxUseNoMADDefaults.Checked
+        ListBoxOptions.Enabled = Not CheckBoxUseNoMADDefaults.Checked
+
+        If CheckBoxUseNoMADDefaults.Checked = True Then
+            ListBoxOptions.DataSource = arrDefaultsOptions
+            CheckBoxAutoMount.Checked = boolDefaultsAutoMount
+            CheckBoxConnectedOnly.Checked = boolDefaultsConnectedOnly
+            ListBoxOptions.SelectedItem = Nothing
+        Else
+            tableMountOptions.DefaultView.RowFilter() = String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue)
+            ListBoxOptions.DataSource = tableMountOptions
+            ListBoxOptions.DisplayMember = "Option"
+            ListBoxOptions.ValueMember = "Option"
+            Dim row As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0)
+            CheckBoxAutoMount.Checked = row("AutoMount")
+            CheckBoxConnectedOnly.Checked = row("ConnectedOnly")
+        End If
+    End Sub
+
     Private Sub GroupPolicyNetworkLocations_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If Not changesSaved Then
             ' Ask if they really want to quit, their changes haven't been saved
@@ -661,6 +782,36 @@ Public Class GroupPolicyNetworkLocations
                 strGPPath = "\\" + strDomainName + "\SYSVOL\" + strDomainName + "\Policies\" + strGPUID + "\User\Preferences"
                 TextBoxPolicyName.Text = tableGroupPolicies.Select(String.Format("PolicyGUID = '{0}'", strGPUID))(0)("PolicyName")
                 TextBoxPolicyGUID.Text = strGPUID
+            Catch
+            End Try
+            Try
+                boolHomeAutoMount = regUserSettings.GetValue("HomeAutoMount")
+            Catch
+            End Try
+            Try
+                boolDefaultsAutoMount = regUserSettings.GetValue("DefaultsAutoMount")
+            Catch
+            End Try
+            Try
+                boolDefaultsConnectedOnly = regUserSettings.GetValue("DefaultsConnectedOnly")
+            Catch
+            End Try
+            Try
+                For Each strDefaultOption In regUserSettings.GetValue("DefaultsOptions")
+                    arrDefaultsOptions.Add(strDefaultOption)
+                Next
+            Catch
+            End Try
+            Try
+                For Each strHomeOption In regUserSettings.GetValue("HomeOptions")
+                    arrHomeOptions.Add(strHomeOption)
+                Next
+            Catch
+            End Try
+            Try
+                For Each strHomeGroup In regUserSettings.GetValue("HomeGroups")
+                    arrHomeGroups.Add(strHomeGroup)
+                Next
             Catch
             End Try
         Else
@@ -726,6 +877,124 @@ Public Class GroupPolicyNetworkLocations
                 changesSaved = False
             End If
         End If
+    End Sub
+
+    Private Sub ExportToNoMADPLISTToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExportToNoMADPLISTToolStripMenuItem.Click
+        Dim plistNoMADShares As New NSDictionary()
+
+        plistNoMADShares.Add("Version", "1")
+
+        'Create HomeMount dict
+        Dim dictHomeMount As New NSDictionary()
+        Dim arrHomeMountGroups As New NSArray()
+        For Each strGroupName In arrHomeGroups.ToArray
+            arrHomeMountGroups.Add(strGroupName)
+        Next
+        dictHomeMount.Add("Groups", arrHomeMountGroups)
+        dictHomeMount.Add("Mount", boolHomeAutoMount)
+        Dim arrHomeMountOptions As New NSArray()
+        For Each strOption In arrHomeOptions.ToArray
+            arrHomeMountOptions.Add(strOption)
+        Next
+        dictHomeMount.Add("Options", arrHomeMountOptions)
+        plistNoMADShares.Add("HomeMount", dictHomeMount)
+
+        Dim arrShares As New NSArray()
+        For Each shareRow In tableNetworkLocations.Rows
+            Dim dictShare As New NSDictionary()
+
+            If shareRow("UseNoMADDefaults") Then
+                dictShare.Add("AutoMount", boolDefaultsAutoMount)
+                dictShare.Add("ConnectedOnly", boolDefaultsConnectedOnly)
+            Else
+                dictShare.Add("AutoMount", shareRow("AutoMount"))
+                dictShare.Add("ConnectedOnly", shareRow("ConnectedOnly"))
+            End If
+            Dim arrGroups As New NSArray()
+            If tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName"))).Count() > 0 Then
+                For Each groupRow In tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName")))
+                    arrGroups.Add(groupRow("GroupName").ToString().Substring(groupRow("GroupName").ToString().IndexOf("\") + 1))
+                Next
+            End If
+            dictShare.Add("Groups", arrGroups)
+            dictShare.Add("Name", shareRow("ShareName"))
+            Dim arrOptions As New NSArray()
+            If shareRow("UseNoMADDefaults") Then
+                For Each strOption In arrDefaultsOptions.ToArray
+                    arrOptions.Add(strOption)
+                Next
+            Else
+                If tableMountOptions.Select(String.Format("ShareName = '{0}'", shareRow("ShareName"))).Count() > 0 Then
+                    For Each optionRow In tableMountOptions.Select(String.Format("ShareName = '{0}'", shareRow("ShareName")))
+                        arrOptions.Add(optionRow("Option").ToString())
+                    Next
+                End If
+            End If
+            dictShare.Add("Options", arrOptions)
+            dictShare.Add("URL", ConvertToSMB(shareRow("ShareTarget")))
+
+            arrShares.Add(dictShare)
+        Next
+        plistNoMADShares.Add("Shares", arrShares)
+
+        Dim SaveFileDialogNoMAD As New SaveFileDialog()
+
+        SaveFileDialogNoMAD.Filter = "PLIST Files (*.plist)|*.plist|All Files (*.*)|*"
+        SaveFileDialogNoMAD.OverwritePrompt = True
+
+        If SaveFileDialogNoMAD.ShowDialog = DialogResult.OK Then
+            PropertyListParser.SaveAsXml(plistNoMADShares, New FileInfo(SaveFileDialogNoMAD.FileName))
+        End If
+    End Sub
+
+    Private Sub CheckBoxUseNoMADDefaults_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxUseNoMADDefaults.CheckedChanged
+        Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
+        If rows.Count > 0 Then
+            rows(0)("UseNoMADDefaults") = CheckBoxUseNoMADDefaults.Checked
+        End If
+        NoMADDefaultsEval()
+    End Sub
+
+    Private Sub ButtonAddOption_Click(sender As Object, e As EventArgs) Handles ButtonAddOption.Click
+        Dim result As DialogResult = DialogAddOption.ShowDialog()
+        If result = DialogResult.OK Then
+            Dim strShareName As String = ListBoxShareNames.SelectedValue.ToString
+            Dim strOption As String = DialogAddOption.ComboBoxOptionList.SelectedItem("Option").ToString
+            Dim optionRow As DataRow
+            Try
+                optionRow = tableMountOptions.Select(String.Format("ShareName = '{0}' And Option = '{1}'", strShareName, strOption))(0)
+            Catch
+                optionRow = tableMountOptions.NewRow
+                optionRow("ShareName") = strShareName
+                optionRow("Option") = strOption
+                tableMountOptions.Rows.Add(optionRow)
+            End Try
+        End If
+    End Sub
+
+    Private Sub CheckBoxAutoMount_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxAutoMount.CheckedChanged
+        If Not CheckBoxUseNoMADDefaults.Checked Then
+            Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
+            If rows.Count > 0 Then
+                rows(0)("AutoMount") = CheckBoxAutoMount.Checked
+            End If
+        End If
+    End Sub
+
+    Private Sub CheckBoxConnectedOnly_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBoxConnectedOnly.CheckedChanged
+        If Not CheckBoxUseNoMADDefaults.Checked Then
+            Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
+            If rows.Count > 0 Then
+                rows(0)("ConnectedOnly") = CheckBoxConnectedOnly.Checked
+            End If
+        End If
+    End Sub
+
+    Private Sub ButtonDeleteOption_Click(sender As Object, e As EventArgs) Handles ButtonDeleteOption.Click
+        Dim strShareName As String = ListBoxShareNames.SelectedValue.ToString
+        Dim strOption As String = ListBoxOptions.SelectedValue.ToString
+        Dim optionRow As DataRow = tableMountOptions.Select(String.Format("ShareName = '{0}' And Option = '{1}'", strShareName, strOption))(0)
+        tableMountOptions.Rows.Remove(optionRow)
     End Sub
 
     Private Sub ButtonAddNewShare_Click(sender As Object, e As EventArgs) Handles ButtonAddNewShare.Click
@@ -798,10 +1067,6 @@ Public Class GroupPolicyNetworkLocations
 
                 ' Clear form data
                 TextBoxLastModified.Clear()
-                TextBoxFoldersUID.Clear()
-                TextBoxIni1UID.Clear()
-                TextBoxIni2UID.Clear()
-                TextBoxShortcutsUID.Clear()
                 TextBoxLocationName.Clear()
                 TextBoxTargetPath.Clear()
 

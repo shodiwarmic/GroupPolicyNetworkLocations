@@ -29,17 +29,13 @@ Partial Class GroupPolicyNetworkLocations
         Me.ReadFromGroupPolicyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.GenerateXMLToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
+        Me.ExportToNoMADPLISTToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
         Me.QuitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SettingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.TextBoxIni1UID = New System.Windows.Forms.TextBox()
-        Me.TextBoxFoldersUID = New System.Windows.Forms.TextBox()
-        Me.TextBoxShortcutsUID = New System.Windows.Forms.TextBox()
         Me.ButtonAddNewShare = New System.Windows.Forms.Button()
         Me.ButtonDeleteShare = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
@@ -49,8 +45,8 @@ Partial Class GroupPolicyNetworkLocations
         Me.TextBoxLastModified = New System.Windows.Forms.TextBox()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.TextBoxIni2UID = New System.Windows.Forms.TextBox()
+        Me.CheckBoxConnectedOnly = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxAutoMount = New System.Windows.Forms.CheckBox()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.ButtonSaveChanges = New System.Windows.Forms.Button()
         Me.ButtonDiscardChanges = New System.Windows.Forms.Button()
@@ -63,12 +59,18 @@ Partial Class GroupPolicyNetworkLocations
         Me.Label8 = New System.Windows.Forms.Label()
         Me.Label9 = New System.Windows.Forms.Label()
         Me.TextBoxPolicyGUID = New System.Windows.Forms.TextBox()
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.ListBoxOptions = New System.Windows.Forms.ListBox()
+        Me.ButtonDeleteOption = New System.Windows.Forms.Button()
+        Me.ButtonAddOption = New System.Windows.Forms.Button()
+        Me.CheckBoxUseNoMADDefaults = New System.Windows.Forms.CheckBox()
         Me.MenuStrip1.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         CType(Me.DataGridViewGroups, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
+        Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
         'ListBoxShareNames
@@ -76,7 +78,7 @@ Partial Class GroupPolicyNetworkLocations
         Me.ListBoxShareNames.FormattingEnabled = True
         Me.ListBoxShareNames.Location = New System.Drawing.Point(6, 19)
         Me.ListBoxShareNames.Name = "ListBoxShareNames"
-        Me.ListBoxShareNames.Size = New System.Drawing.Size(172, 394)
+        Me.ListBoxShareNames.Size = New System.Drawing.Size(171, 407)
         Me.ListBoxShareNames.TabIndex = 0
         '
         'MenuStrip1
@@ -90,7 +92,7 @@ Partial Class GroupPolicyNetworkLocations
         '
         'FileToolStripMenuItem
         '
-        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReadFromGroupPolicyToolStripMenuItem, Me.GenerateXMLToolStripMenuItem, Me.ToolStripSeparator1, Me.QuitToolStripMenuItem})
+        Me.FileToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ReadFromGroupPolicyToolStripMenuItem, Me.GenerateXMLToolStripMenuItem, Me.ToolStripSeparator1, Me.ExportToNoMADPLISTToolStripMenuItem, Me.ToolStripSeparator2, Me.QuitToolStripMenuItem})
         Me.FileToolStripMenuItem.Name = "FileToolStripMenuItem"
         Me.FileToolStripMenuItem.Size = New System.Drawing.Size(37, 20)
         Me.FileToolStripMenuItem.Text = "File"
@@ -111,6 +113,17 @@ Partial Class GroupPolicyNetworkLocations
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
         Me.ToolStripSeparator1.Size = New System.Drawing.Size(197, 6)
+        '
+        'ExportToNoMADPLISTToolStripMenuItem
+        '
+        Me.ExportToNoMADPLISTToolStripMenuItem.Name = "ExportToNoMADPLISTToolStripMenuItem"
+        Me.ExportToNoMADPLISTToolStripMenuItem.Size = New System.Drawing.Size(200, 22)
+        Me.ExportToNoMADPLISTToolStripMenuItem.Text = "Export to NoMAD PLIST"
+        '
+        'ToolStripSeparator2
+        '
+        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(197, 6)
         '
         'QuitToolStripMenuItem
         '
@@ -141,63 +154,12 @@ Partial Class GroupPolicyNetworkLocations
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(107, 22)
         Me.AboutToolStripMenuItem.Text = "About"
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(6, 22)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(46, 13)
-        Me.Label1.TabIndex = 2
-        Me.Label1.Text = "Ini1 UID"
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(6, 75)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(63, 13)
-        Me.Label2.TabIndex = 3
-        Me.Label2.Text = "Folders UID"
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(6, 101)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(74, 13)
-        Me.Label3.TabIndex = 4
-        Me.Label3.Text = "Shortcuts UID"
-        '
-        'TextBoxIni1UID
-        '
-        Me.TextBoxIni1UID.Enabled = False
-        Me.TextBoxIni1UID.Location = New System.Drawing.Point(95, 19)
-        Me.TextBoxIni1UID.Name = "TextBoxIni1UID"
-        Me.TextBoxIni1UID.Size = New System.Drawing.Size(321, 20)
-        Me.TextBoxIni1UID.TabIndex = 5
-        '
-        'TextBoxFoldersUID
-        '
-        Me.TextBoxFoldersUID.Enabled = False
-        Me.TextBoxFoldersUID.Location = New System.Drawing.Point(95, 72)
-        Me.TextBoxFoldersUID.Name = "TextBoxFoldersUID"
-        Me.TextBoxFoldersUID.Size = New System.Drawing.Size(321, 20)
-        Me.TextBoxFoldersUID.TabIndex = 6
-        '
-        'TextBoxShortcutsUID
-        '
-        Me.TextBoxShortcutsUID.Enabled = False
-        Me.TextBoxShortcutsUID.Location = New System.Drawing.Point(95, 98)
-        Me.TextBoxShortcutsUID.Name = "TextBoxShortcutsUID"
-        Me.TextBoxShortcutsUID.Size = New System.Drawing.Size(321, 20)
-        Me.TextBoxShortcutsUID.TabIndex = 7
         '
         'ButtonAddNewShare
         '
-        Me.ButtonAddNewShare.Location = New System.Drawing.Point(6, 419)
+        Me.ButtonAddNewShare.Location = New System.Drawing.Point(6, 432)
         Me.ButtonAddNewShare.Name = "ButtonAddNewShare"
         Me.ButtonAddNewShare.Size = New System.Drawing.Size(83, 23)
         Me.ButtonAddNewShare.TabIndex = 8
@@ -206,7 +168,7 @@ Partial Class GroupPolicyNetworkLocations
         '
         'ButtonDeleteShare
         '
-        Me.ButtonDeleteShare.Location = New System.Drawing.Point(95, 419)
+        Me.ButtonDeleteShare.Location = New System.Drawing.Point(94, 432)
         Me.ButtonDeleteShare.Name = "ButtonDeleteShare"
         Me.ButtonDeleteShare.Size = New System.Drawing.Size(83, 23)
         Me.ButtonDeleteShare.TabIndex = 9
@@ -218,7 +180,7 @@ Partial Class GroupPolicyNetworkLocations
         Me.GroupBox1.Controls.Add(Me.DataGridViewGroups)
         Me.GroupBox1.Controls.Add(Me.ButtonAddGroup)
         Me.GroupBox1.Controls.Add(Me.ButtonDeleteGroup)
-        Me.GroupBox1.Location = New System.Drawing.Point(184, 282)
+        Me.GroupBox1.Location = New System.Drawing.Point(184, 298)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(422, 160)
         Me.GroupBox1.TabIndex = 11
@@ -274,37 +236,36 @@ Partial Class GroupPolicyNetworkLocations
         '
         'GroupBox2
         '
-        Me.GroupBox2.Controls.Add(Me.Label7)
-        Me.GroupBox2.Controls.Add(Me.TextBoxIni2UID)
-        Me.GroupBox2.Controls.Add(Me.Label1)
-        Me.GroupBox2.Controls.Add(Me.Label2)
-        Me.GroupBox2.Controls.Add(Me.Label3)
-        Me.GroupBox2.Controls.Add(Me.TextBoxIni1UID)
-        Me.GroupBox2.Controls.Add(Me.TextBoxFoldersUID)
-        Me.GroupBox2.Controls.Add(Me.TextBoxShortcutsUID)
+        Me.GroupBox2.Controls.Add(Me.CheckBoxUseNoMADDefaults)
+        Me.GroupBox2.Controls.Add(Me.GroupBox5)
+        Me.GroupBox2.Controls.Add(Me.CheckBoxConnectedOnly)
+        Me.GroupBox2.Controls.Add(Me.CheckBoxAutoMount)
         Me.GroupBox2.Location = New System.Drawing.Point(184, 45)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(422, 124)
+        Me.GroupBox2.Size = New System.Drawing.Size(422, 140)
         Me.GroupBox2.TabIndex = 14
         Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Unique IDs"
+        Me.GroupBox2.Text = "NoMAD Settings"
         '
-        'Label7
+        'CheckBoxConnectedOnly
         '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(6, 49)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(46, 13)
-        Me.Label7.TabIndex = 9
-        Me.Label7.Text = "Ini2 UID"
+        Me.CheckBoxConnectedOnly.AutoSize = True
+        Me.CheckBoxConnectedOnly.Location = New System.Drawing.Point(8, 103)
+        Me.CheckBoxConnectedOnly.Name = "CheckBoxConnectedOnly"
+        Me.CheckBoxConnectedOnly.Size = New System.Drawing.Size(102, 17)
+        Me.CheckBoxConnectedOnly.TabIndex = 1
+        Me.CheckBoxConnectedOnly.Text = "Connected Only"
+        Me.CheckBoxConnectedOnly.UseVisualStyleBackColor = True
         '
-        'TextBoxIni2UID
+        'CheckBoxAutoMount
         '
-        Me.TextBoxIni2UID.Enabled = False
-        Me.TextBoxIni2UID.Location = New System.Drawing.Point(95, 46)
-        Me.TextBoxIni2UID.Name = "TextBoxIni2UID"
-        Me.TextBoxIni2UID.Size = New System.Drawing.Size(321, 20)
-        Me.TextBoxIni2UID.TabIndex = 8
+        Me.CheckBoxAutoMount.AutoSize = True
+        Me.CheckBoxAutoMount.Location = New System.Drawing.Point(9, 61)
+        Me.CheckBoxAutoMount.Name = "CheckBoxAutoMount"
+        Me.CheckBoxAutoMount.Size = New System.Drawing.Size(81, 17)
+        Me.CheckBoxAutoMount.TabIndex = 0
+        Me.CheckBoxAutoMount.Text = "Auto Mount"
+        Me.CheckBoxAutoMount.UseVisualStyleBackColor = True
         '
         'GroupBox3
         '
@@ -314,7 +275,7 @@ Partial Class GroupPolicyNetworkLocations
         Me.GroupBox3.Controls.Add(Me.TextBoxTargetPath)
         Me.GroupBox3.Controls.Add(Me.Label5)
         Me.GroupBox3.Controls.Add(Me.TextBoxLocationName)
-        Me.GroupBox3.Location = New System.Drawing.Point(185, 175)
+        Me.GroupBox3.Location = New System.Drawing.Point(183, 191)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(421, 101)
         Me.GroupBox3.TabIndex = 15
@@ -383,7 +344,7 @@ Partial Class GroupPolicyNetworkLocations
         Me.GroupBox4.Controls.Add(Me.GroupBox1)
         Me.GroupBox4.Location = New System.Drawing.Point(12, 54)
         Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(612, 448)
+        Me.GroupBox4.Size = New System.Drawing.Size(612, 464)
         Me.GroupBox4.TabIndex = 16
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Network Locations"
@@ -422,12 +383,60 @@ Partial Class GroupPolicyNetworkLocations
         Me.TextBoxPolicyGUID.Size = New System.Drawing.Size(294, 20)
         Me.TextBoxPolicyGUID.TabIndex = 20
         '
+        'GroupBox5
+        '
+        Me.GroupBox5.Controls.Add(Me.ListBoxOptions)
+        Me.GroupBox5.Controls.Add(Me.ButtonDeleteOption)
+        Me.GroupBox5.Controls.Add(Me.ButtonAddOption)
+        Me.GroupBox5.Location = New System.Drawing.Point(221, 19)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Size = New System.Drawing.Size(194, 106)
+        Me.GroupBox5.TabIndex = 5
+        Me.GroupBox5.TabStop = False
+        Me.GroupBox5.Text = "Options"
+        '
+        'ListBoxOptions
+        '
+        Me.ListBoxOptions.FormattingEnabled = True
+        Me.ListBoxOptions.Location = New System.Drawing.Point(6, 19)
+        Me.ListBoxOptions.Name = "ListBoxOptions"
+        Me.ListBoxOptions.Size = New System.Drawing.Size(114, 82)
+        Me.ListBoxOptions.TabIndex = 2
+        '
+        'ButtonDeleteOption
+        '
+        Me.ButtonDeleteOption.Location = New System.Drawing.Point(126, 64)
+        Me.ButtonDeleteOption.Name = "ButtonDeleteOption"
+        Me.ButtonDeleteOption.Size = New System.Drawing.Size(62, 37)
+        Me.ButtonDeleteOption.TabIndex = 1
+        Me.ButtonDeleteOption.Text = "Delete Option"
+        Me.ButtonDeleteOption.UseVisualStyleBackColor = True
+        '
+        'ButtonAddOption
+        '
+        Me.ButtonAddOption.Location = New System.Drawing.Point(126, 19)
+        Me.ButtonAddOption.Name = "ButtonAddOption"
+        Me.ButtonAddOption.Size = New System.Drawing.Size(62, 38)
+        Me.ButtonAddOption.TabIndex = 0
+        Me.ButtonAddOption.Text = "Add Option"
+        Me.ButtonAddOption.UseVisualStyleBackColor = True
+        '
+        'CheckBoxUseNoMADDefaults
+        '
+        Me.CheckBoxUseNoMADDefaults.AutoSize = True
+        Me.CheckBoxUseNoMADDefaults.Location = New System.Drawing.Point(8, 19)
+        Me.CheckBoxUseNoMADDefaults.Name = "CheckBoxUseNoMADDefaults"
+        Me.CheckBoxUseNoMADDefaults.Size = New System.Drawing.Size(87, 17)
+        Me.CheckBoxUseNoMADDefaults.TabIndex = 6
+        Me.CheckBoxUseNoMADDefaults.Text = "Use Defaults"
+        Me.CheckBoxUseNoMADDefaults.UseVisualStyleBackColor = True
+        '
         'GroupPolicyNetworkLocations
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoSize = True
-        Me.ClientSize = New System.Drawing.Size(636, 514)
+        Me.ClientSize = New System.Drawing.Size(636, 530)
         Me.Controls.Add(Me.TextBoxPolicyGUID)
         Me.Controls.Add(Me.Label9)
         Me.Controls.Add(Me.Label8)
@@ -449,6 +458,7 @@ Partial Class GroupPolicyNetworkLocations
         Me.GroupBox3.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
+        Me.GroupBox5.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -460,12 +470,6 @@ Partial Class GroupPolicyNetworkLocations
     Friend WithEvents QuitToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents HelpToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents Label1 As Label
-    Friend WithEvents Label2 As Label
-    Friend WithEvents Label3 As Label
-    Friend WithEvents TextBoxIni1UID As TextBox
-    Friend WithEvents TextBoxFoldersUID As TextBox
-    Friend WithEvents TextBoxShortcutsUID As TextBox
     Friend WithEvents ButtonAddNewShare As Button
     Friend WithEvents ButtonDeleteShare As Button
     Friend WithEvents GroupBox1 As GroupBox
@@ -484,8 +488,6 @@ Partial Class GroupPolicyNetworkLocations
     Friend WithEvents ButtonDiscardChanges As Button
     Friend WithEvents GenerateXMLToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
-    Friend WithEvents Label7 As Label
-    Friend WithEvents TextBoxIni2UID As TextBox
     Friend WithEvents ReadFromGroupPolicyToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents SettingsToolStripMenuItem As ToolStripMenuItem
@@ -494,4 +496,13 @@ Partial Class GroupPolicyNetworkLocations
     Friend WithEvents Label8 As Label
     Friend WithEvents Label9 As Label
     Friend WithEvents TextBoxPolicyGUID As TextBox
+    Friend WithEvents CheckBoxConnectedOnly As CheckBox
+    Friend WithEvents CheckBoxAutoMount As CheckBox
+    Friend WithEvents ExportToNoMADPLISTToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
+    Friend WithEvents CheckBoxUseNoMADDefaults As CheckBox
+    Friend WithEvents GroupBox5 As GroupBox
+    Friend WithEvents ListBoxOptions As ListBox
+    Friend WithEvents ButtonDeleteOption As Button
+    Friend WithEvents ButtonAddOption As Button
 End Class
