@@ -15,7 +15,7 @@
 
             If desiredAssembly.Name = "ActiveDirectoryObjectPicker" Then
                 Return Reflection.Assembly.Load(My.Resources.ActiveDirectoryObjectPicker) 'replace with your assembly's resource name
-            ElseIf desiredAssembly.Name = "plist_cil" Then
+            ElseIf desiredAssembly.Name = "plist-cil" Then
                 Return Reflection.Assembly.Load(My.Resources.plist_cil) 'replace with your assembly's resource name
             Else
                 Return Nothing
