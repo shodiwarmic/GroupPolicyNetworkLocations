@@ -787,14 +787,17 @@ Public Class GroupPolicyNetworkLocations
             Try
                 boolHomeAutoMount = regUserSettings.GetValue("HomeAutoMount")
             Catch
+                boolHomeAutoMount = True
             End Try
             Try
                 boolDefaultsAutoMount = regUserSettings.GetValue("DefaultsAutoMount")
             Catch
+                boolDefaultsAutoMount = True
             End Try
             Try
                 boolDefaultsConnectedOnly = regUserSettings.GetValue("DefaultsConnectedOnly")
             Catch
+                boolDefaultsConnectedOnly = True
             End Try
             Try
                 For Each strDefaultOption In regUserSettings.GetValue("DefaultsOptions")
@@ -813,6 +816,7 @@ Public Class GroupPolicyNetworkLocations
                     arrHomeGroups.Add(strHomeGroup)
                 Next
             Catch
+                arrHomeGroups.Add("All")
             End Try
         Else
             ' Set the registry setting to the current policy UID
