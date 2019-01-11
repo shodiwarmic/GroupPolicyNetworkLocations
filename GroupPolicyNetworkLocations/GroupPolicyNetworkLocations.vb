@@ -13,6 +13,12 @@ Public Class GroupPolicyNetworkLocations
     ' *           Global Constants Declared Below           * '
     ' ******************************************************* '
 
+    ' Used in description field to store NoMAD settings in AD for the next import, so you don't need to recreate custom settings every time.
+    Const DescriptionPrefix = "Automatically created by GroupPolicyNetworkLocations." + vbLf + vbLf +
+                              "Please visit https://github.com/jperryNPS/GroupPolicyNetworkLocations to download the program."
+    Const DataBlockStart = "##DATABLOCK_NoMAD_Settings_START##"
+    Const DataBlockEnd = "##DATABLOCK_NoMAD_Settings_END##"
+
     ' Used in Ini Folder and Shortcut
     Const ShareImage = "2"
     Const ShareUserContext = "1"
@@ -435,8 +441,8 @@ Public Class GroupPolicyNetworkLocations
             ' The above comment applies to specifically the next 13 lines and this program in general.
             sbIniFilesXML.AppendLine(String.Format("  <Ini clsid=""{0}"" name=""{1}"" status=""{2}"" image=""{3}"" changed=""{4:yyyy-MM-dd HH:mm:ss}"" uid=""{5}"" userContext=""{6}"" bypassErrors=""{7}"">",
                                                        IniClsid, Ini1Name, Ini1Status, ShareImage, shareRow("LastModified"), shareRow("Ini1UID"), ShareUserContext, ShareBypassErrors))
-            sbFoldersXML.AppendLine(String.Format("  <Folder clsid=""{0}"" name=""{1}"" status=""{2}"" image=""{3}"" changed=""{4:yyyy-MM-dd HH:mm:ss}"" uid=""{5}"" disabled=""{6}"" userContext=""{7}"" bypassErrors=""{8}"">",
-                                                           FolderClsid, shareRow("ShareName"), shareRow("ShareName"), ShareImage, shareRow("LastModified"), shareRow("FoldersUID"), FolderDisabled, ShareUserContext, ShareBypassErrors))
+            sbFoldersXML.AppendLine(String.Format("  <Folder clsid=""{0}"" name=""{1}"" status=""{2}"" image=""{3}"" changed=""{4:yyyy-MM-dd HH:mm:ss}"" uid=""{5}"" disabled=""{6}"" desc=""{7}"" userContext=""{8}"" bypassErrors=""{9}"">",
+                                                           FolderClsid, shareRow("ShareName"), shareRow("ShareName"), ShareImage, shareRow("LastModified"), shareRow("FoldersUID"), FolderDisabled, GenerateDescription(shareRow), ShareUserContext, ShareBypassErrors))
             sbShortcutsXML.AppendLine(String.Format("  <Shortcut clsid=""{0}"" name=""{1}"" status=""{2}"" image=""{3}"" changed=""{4:yyyy-MM-dd HH:mm:ss}"" uid=""{5}"" userContext=""{6}"" bypassErrors=""{7}"">",
                                                     ShortcutClsid, ShortcutName, ShortcutStatus, ShareImage, shareRow("LastModified"), shareRow("ShortcutsUID"), ShareUserContext, ShareBypassErrors))
 
@@ -514,11 +520,35 @@ Public Class GroupPolicyNetworkLocations
         strShortcutsXML = sbShortcutsXML.ToString
     End Sub
 
+    Private Function GenerateDescription(shareInfo As DataRow) As String
+        Dim DescriptionString As String
+
+        DescriptionString = DescriptionPrefix + vbLf + vbLf + DataBlockStart + vbLf
+        If shareInfo("UseNoMADDefaults") Then
+            DescriptionString += "UseNoMADDefaults=True"
+        Else
+            DescriptionString += "UseNoMADDefaults=False" + vbLf + "AutoMount=" + shareInfo("AutoMount").ToString() + vbLf + "ConnectedOnly=" + shareInfo("ConnectedOnly").ToString()
+
+            If tableMountOptions.Select(String.Format("ShareName = '{0}'", shareInfo("ShareName"))).Count() > 0 Then
+                DescriptionString += vbLf + "Options="
+                For Each optionRow In tableMountOptions.Select(String.Format("ShareName = '{0}'", shareInfo("ShareName")))
+                    If (DescriptionString(DescriptionString.Length - 1) <> "=") Then DescriptionString += ","
+                    DescriptionString += optionRow("Option").ToString()
+                Next
+            End If
+
+        End If
+        DescriptionString += vbLf + DataBlockEnd
+
+        Return DescriptionString
+    End Function
+
     Private Sub ReloadData()
 
         ' Clear out the tables
         tableNetworkLocations.Clear()
         tableFilterGroups.Clear()
+        tableMountOptions.Clear()
 
         If File.Exists(strGPPath + "\IniFiles\IniFiles.xml") Then
             ' Load the file if it exists
@@ -585,20 +615,21 @@ Public Class GroupPolicyNetworkLocations
                 Dim strUID As String = Folder.Attributes("uid").Value
                 Dim timeModified As DateTime = Folder.Attributes("changed").Value
                 Dim strShareName As String = Folder.Attributes("name").Value
-                Dim row As DataRow
+                Dim strDescription As String = Folder.Attributes("desc").Value
+                Dim rowNetLoc, rowGroup, rowOption As DataRow
                 ' Add data to row
                 Try
-                    row = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", strShareName))(0)
-                    row("FoldersUID") = strUID.ToUpper
+                    rowNetLoc = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", strShareName))(0)
+                    rowNetLoc("FoldersUID") = strUID.ToUpper
                     ' Only update time modified if it is later
-                    If timeModified > row("LastModified") Then row("LastModified") = timeModified
+                    If timeModified > rowNetLoc("LastModified") Then rowNetLoc("LastModified") = timeModified
                 Catch
                     ' Row doesn't exist, create it now
-                    row = tableNetworkLocations.NewRow
-                    row("ShareName") = strShareName
-                    row("FoldersUID") = strUID.ToUpper
-                    row("LastModified") = timeModified
-                    tableNetworkLocations.Rows.Add(row)
+                    rowNetLoc = tableNetworkLocations.NewRow
+                    rowNetLoc("ShareName") = strShareName
+                    rowNetLoc("FoldersUID") = strUID.ToUpper
+                    rowNetLoc("LastModified") = timeModified
+                    tableNetworkLocations.Rows.Add(rowNetLoc)
                 End Try
                 ' Add all Filters to filter table
                 If Folder.ChildNodes.Count > 1 Then
@@ -606,16 +637,46 @@ Public Class GroupPolicyNetworkLocations
                         Dim strGroupName As String = FilterGroup.Attributes("name").Value
                         Dim strGroupSID As String = FilterGroup.Attributes("sid").Value
                         Try
-                            row = tableFilterGroups.Select(String.Format("ShareName = '{0}' And GroupName = '{1}' And GroupSID = '{2}'", strShareName, strGroupName, strGroupSID))(0)
+                            rowGroup = tableFilterGroups.Select(String.Format("ShareName = '{0}' And GroupName = '{1}' And GroupSID = '{2}'", strShareName, strGroupName, strGroupSID))(0)
                         Catch
-                            row = tableFilterGroups.NewRow
-                            row("ShareName") = strShareName
-                            row("GroupName") = strGroupName
-                            row("GroupSID") = strGroupSID
-                            tableFilterGroups.Rows.Add(row)
+                            rowGroup = tableFilterGroups.NewRow
+                            rowGroup("ShareName") = strShareName
+                            rowGroup("GroupName") = strGroupName
+                            rowGroup("GroupSID") = strGroupSID
+                            tableFilterGroups.Rows.Add(rowGroup)
                         End Try
                     Next
                 End If
+                ' Read NoMAD Settings from description field
+                Dim processLine As Boolean = False
+                For Each line In strDescription.Split(vbLf)
+                    If (line = DataBlockEnd) Then
+                        ' Check if this is the end of the dataset
+                        processLine = False
+                    ElseIf (processLine) Then
+                        Dim strArr() As String = line.Split("=")
+                        If (strArr(0) = "Options") Then
+                            Dim strArrOptions() As String = strArr(1).Split(",")
+                            For Each strOption In strArrOptions
+                                Try
+                                    rowOption = tableMountOptions.Select(String.Format("ShareName = '{0}' And Option = '{1}'", strShareName, strOption))(0)
+                                Catch
+                                    rowOption = tableMountOptions.NewRow
+                                    rowOption("ShareName") = strShareName
+                                    rowOption("Option") = strOption
+                                    tableMountOptions.Rows.Add(rowOption)
+                                End Try
+                            Next
+                        Else
+                            rowNetLoc(strArr(0)) = strArr(1)
+                        End If
+                    ElseIf (line = DataBlockStart) Then
+                        ' Set if we will process the next line or not
+                        processLine = True
+                    End If
+                Next
+
+
             Next
         End If
 
