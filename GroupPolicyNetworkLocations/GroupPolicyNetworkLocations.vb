@@ -1147,18 +1147,15 @@ Public Class GroupPolicyNetworkLocations
         If ADPicker.ShowDialog = DialogResult.OK Then
             For Each SelectedObject In ADPicker.SelectedObjects
                 Dim objGroup As DirectoryEntry = New DirectoryEntry(SelectedObject.Path)
-                Dim strNP1, strNP2 As String
+                Dim strNetbiosSearchString As String = "LDAP://CN=Partitions,CN=Configuration"
                 For Each part In objGroup.Properties.Item("distinguishedName").Value.ToString.Split(",")
-                    ' Use distinguishedName to find group name with short domain name
-                    If part.StartsWith("CN=") And strNP2 Is Nothing Then
-                        strNP2 = part.Remove(0, 3)
-                    ElseIf part.StartsWith("DC=") And strNP1 Is Nothing Then
-                        strNP1 = part.Remove(0, 3)
+                    If part.StartsWith("DC=") Then
+                        strNetbiosSearchString += "," + part.ToString()
                     End If
-                    If strNP2 <> Nothing And strNP1 <> Nothing Then Exit For
                 Next
+
                 Dim strShareName As String = ListBoxShareNames.SelectedValue.ToString
-                Dim strGroupName As String = strNP1.ToUpper + "\" + strNP2
+                Dim strGroupName As String = GetNetBiosName(strNetbiosSearchString) + "\" + objGroup.Properties.Item("cn").Value
                 Dim strGroupSID As String = (New Security.Principal.SecurityIdentifier(objGroup.Properties.Item("objectSid").Value, 0)).Value
                 Dim groupRow As DataRow
                 ' Add the row if it doesn't already exist
@@ -1170,13 +1167,28 @@ Public Class GroupPolicyNetworkLocations
                     groupRow("GroupName") = strGroupName
                     groupRow("GroupSID") = strGroupSID
                     tableFilterGroups.Rows.Add(groupRow)
-                    Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
-                    ChangeMade(rows(0))
+                    ChangeMade(tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0))
                 End Try
-
             Next
         End If
     End Sub
+
+    Private Function GetNetBiosName(ldapUrl As String) As String
+        Dim netbiosName As String
+        Dim dirEntry As DirectoryEntry = New DirectoryEntry(ldapUrl)
+
+        Dim searcher As DirectorySearcher = New DirectorySearcher(dirEntry)
+        searcher.Filter = "netbiosname=*"
+        searcher.PropertiesToLoad.Add("cn")
+
+        Dim results As SearchResultCollection = searcher.FindAll()
+        If (results.Count > 0) Then
+            Dim rpvc As ResultPropertyValueCollection = results(0).Properties("CN")
+            netbiosName = rpvc(0).ToString()
+        End If
+
+        Return netbiosName
+    End Function
 
     Private Sub GenerateXMLToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles GenerateXMLToolStripMenuItem.Click
         ' Populate xml strings
