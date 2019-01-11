@@ -747,6 +747,11 @@ Public Class GroupPolicyNetworkLocations
 
     End Sub
 
+    Private Sub ChangeMade(row As DataRow)
+        row("LastModified") = Now
+        changesSaved = False
+    End Sub
+
     Private Sub RefreshPolicyList()
         ' Remove any old polices from the table
         tableGroupPolicies.Clear()
@@ -919,8 +924,7 @@ Public Class GroupPolicyNetworkLocations
             If rows(0)("ShareTarget") <> TextBoxTargetPath.Text.ToString Then
                 ' Update ShareTarget only if it changed
                 rows(0)("ShareTarget") = TextBoxTargetPath.Text.ToString
-                rows(0)("LastModified") = Now
-                changesSaved = False
+                ChangeMade(rows(0))
             End If
             If rows(0)("ShareName") <> TextBoxLocationName.Text.ToString Then
                 ' Update ShareName only if it changed
@@ -932,8 +936,7 @@ Public Class GroupPolicyNetworkLocations
                     Next
                 End If
                 rows(0)("ShareName") = TextBoxLocationName.Text.ToString
-                rows(0)("LastModified") = Now
-                changesSaved = False
+                ChangeMade(rows(0))
             End If
         End If
     End Sub
@@ -1010,7 +1013,7 @@ Public Class GroupPolicyNetworkLocations
         Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
         If rows.Count > 0 Then
             rows(0)("UseNoMADDefaults") = CheckBoxUseNoMADDefaults.Checked
-            rows(0)("LastModified") = Now
+            ChangeMade(rows(0))
         End If
         NoMADDefaultsEval()
     End Sub
@@ -1029,10 +1032,7 @@ Public Class GroupPolicyNetworkLocations
                 optionRow("Option") = strOption
                 tableMountOptions.Rows.Add(optionRow)
             End Try
-            Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
-            If rows.Count > 0 Then
-                rows(0)("LastModified") = Now
-            End If
+            ChangeMade(tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0))
         End If
     End Sub
 
@@ -1041,7 +1041,7 @@ Public Class GroupPolicyNetworkLocations
             Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
             If rows.Count > 0 Then
                 rows(0)("AutoMount") = CheckBoxAutoMount.Checked
-                rows(0)("LastModified") = Now
+                ChangeMade(rows(0))
             End If
         End If
     End Sub
@@ -1051,7 +1051,7 @@ Public Class GroupPolicyNetworkLocations
             Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
             If rows.Count > 0 Then
                 rows(0)("ConnectedOnly") = CheckBoxConnectedOnly.Checked
-                rows(0)("LastModified") = Now
+                ChangeMade(rows(0))
             End If
         End If
     End Sub
@@ -1061,10 +1061,7 @@ Public Class GroupPolicyNetworkLocations
         Dim strOption As String = ListBoxOptions.SelectedValue.ToString
         Dim optionRow As DataRow = tableMountOptions.Select(String.Format("ShareName = '{0}' And Option = '{1}'", strShareName, strOption))(0)
         tableMountOptions.Rows.Remove(optionRow)
-        Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
-        If rows.Count > 0 Then
-            rows(0)("LastModified") = Now
-        End If
+        ChangeMade(tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0))
     End Sub
 
     Private Sub ButtonAddNewShare_Click(sender As Object, e As EventArgs) Handles ButtonAddNewShare.Click
@@ -1088,7 +1085,6 @@ Public Class GroupPolicyNetworkLocations
                         Dim row As DataRow = tableNetworkLocations.NewRow
                         row("ShareName") = newShareName
                         row("ShareTarget") = newSharePath
-                        row("LastModified") = Now
                         row("Ini1UID") = "{" + Guid.NewGuid.ToString.ToUpper + "}"
                         row("Ini2UID") = "{" + Guid.NewGuid.ToString.ToUpper + "}"
                         row("FoldersUID") = "{" + Guid.NewGuid.ToString.ToUpper + "}"
@@ -1096,8 +1092,8 @@ Public Class GroupPolicyNetworkLocations
                         tableNetworkLocations.Rows.Add(row)
                         ListBoxShareNames.Update()
                         ListBoxShareNames.SelectedValue = newShareName
+                        ChangeMade(row)
                         RefreshView()
-                        changesSaved = False
                         ' Row added, don't show the dialog again
                         boolRetry = False
                     End If
@@ -1175,8 +1171,7 @@ Public Class GroupPolicyNetworkLocations
                     groupRow("GroupSID") = strGroupSID
                     tableFilterGroups.Rows.Add(groupRow)
                     Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
-                    rows(0)("LastModified") = Now
-                    changesSaved = False
+                    ChangeMade(rows(0))
                 End Try
 
             Next
@@ -1232,8 +1227,8 @@ Public Class GroupPolicyNetworkLocations
         ' Remove group from table
         tableFilterGroups.Rows.Remove(groupRow)
         ' Update share modified time
-        tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0)("LastModified") = Now
-        changesSaved = False
+        ChangeMade(tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0))
+
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
