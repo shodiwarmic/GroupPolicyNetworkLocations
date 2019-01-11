@@ -124,75 +124,85 @@ Public Class GroupPolicyNetworkLocations
         ' | * Unique String |   String    |   DateTime   | String  | String  |   String   |    String    |     Boolean      |  Boolean  |    Boolean    |
         ' -----------------------------------------------------------------------------------------------------------------------------------------------
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "ShareName"
-        column.ReadOnly = False
-        column.Unique = True
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "ShareName",
+            .ReadOnly = False,
+            .Unique = True
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "ShareTarget"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "ShareTarget",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.DateTime")
-        column.ColumnName = "LastModified"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.DateTime"),
+            .ColumnName = "LastModified",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "Ini1UID"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "Ini1UID",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "Ini2UID"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "Ini2UID",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "FoldersUID"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "FoldersUID",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "ShortcutsUID"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "ShortcutsUID",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.Boolean")
-        column.ColumnName = "UseNoMADDefaults"
-        column.ReadOnly = False
-        column.Unique = False
-        column.DefaultValue = True
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.Boolean"),
+            .ColumnName = "UseNoMADDefaults",
+            .ReadOnly = False,
+            .Unique = False,
+            .DefaultValue = True
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.Boolean")
-        column.ColumnName = "AutoMount"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.Boolean"),
+            .ColumnName = "AutoMount",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.Boolean")
-        column.ColumnName = "ConnectedOnly"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.Boolean"),
+            .ColumnName = "ConnectedOnly",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableNetworkLocations.Columns.Add(column)
 
         ' Creates a data table that looks something like this for storing Share folder and Mount option connections
@@ -202,18 +212,20 @@ Public Class GroupPolicyNetworkLocations
         ' |  String   | String |
         ' ----------------------
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "ShareName"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "ShareName",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableMountOptions.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "Option"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "Option",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableMountOptions.Columns.Add(column)
 
         ' Creates a data table that looks something like this for storing Share folder and Filter Group connections
@@ -223,25 +235,28 @@ Public Class GroupPolicyNetworkLocations
         ' |  String   |  String   |  String  |
         ' ------------------------------------
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "ShareName"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "ShareName",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableFilterGroups.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "GroupName"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "GroupName",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableFilterGroups.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "GroupSID"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "GroupSID",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableFilterGroups.Columns.Add(column)
 
         ' Creates a data table that looks something like this for storing a list of Group Policy Objects in the domain
@@ -252,39 +267,44 @@ Public Class GroupPolicyNetworkLocations
         ' -----------------------------------------------------------------------------------
 
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "PolicyGUID"
-        column.ReadOnly = False
-        column.Unique = True
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "PolicyGUID",
+            .ReadOnly = False,
+            .Unique = True
+        }
         tableGroupPolicies.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.String")
-        column.ColumnName = "PolicyName"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.String"),
+            .ColumnName = "PolicyName",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableGroupPolicies.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.Boolean")
-        column.ColumnName = "IniFilesExists"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.Boolean"),
+            .ColumnName = "IniFilesExists",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableGroupPolicies.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.Boolean")
-        column.ColumnName = "FoldersExists"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.Boolean"),
+            .ColumnName = "FoldersExists",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableGroupPolicies.Columns.Add(column)
 
-        column = New DataColumn()
-        column.DataType = System.Type.GetType("System.Boolean")
-        column.ColumnName = "ShortcutsExists"
-        column.ReadOnly = False
-        column.Unique = False
+        column = New DataColumn With {
+            .DataType = System.Type.GetType("System.Boolean"),
+            .ColumnName = "ShortcutsExists",
+            .ReadOnly = False,
+            .Unique = False
+        }
         tableGroupPolicies.Columns.Add(column)
 
         ' Temporary primary key column
@@ -558,14 +578,14 @@ Public Class GroupPolicyNetworkLocations
                 Else
                     strShareName = arrPath(0)
                 End If
-                Dim strRowName As String
+                Dim strRowName As String = ""
                 ' Determine which Ini item to use
                 If strIniProp = "CLSID2" Then
                     strRowName = "Ini1UID"
                 ElseIf strIniProp = "Flags" Then
                     strRowName = "Ini2UID"
                 End If
-                If Not strRowName Is Nothing Then
+                If strRowName <> "" Then
                     Dim row As DataRow
                     ' Add data to row
                     Try
@@ -942,44 +962,34 @@ Public Class GroupPolicyNetworkLocations
     End Sub
 
     Private Sub ExportToNoMADPLISTToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExportToNoMADPLISTToolStripMenuItem.Click
-        Dim plistNoMADShares As New NSDictionary()
 
-        plistNoMADShares.Add("Version", "1")
-
-        'Create HomeMount dict
-        Dim dictHomeMount As New NSDictionary()
         Dim arrHomeMountGroups As New NSArray()
         For Each strGroupName In arrHomeGroups.ToArray
             arrHomeMountGroups.Add(strGroupName)
         Next
-        dictHomeMount.Add("Groups", arrHomeMountGroups)
-        dictHomeMount.Add("Mount", boolHomeAutoMount)
+
         Dim arrHomeMountOptions As New NSArray()
         For Each strOption In arrHomeOptions.ToArray
             arrHomeMountOptions.Add(strOption)
         Next
-        dictHomeMount.Add("Options", arrHomeMountOptions)
-        plistNoMADShares.Add("HomeMount", dictHomeMount)
+
+        Dim dictHomeMount As New NSDictionary From {
+            {"Groups", arrHomeMountGroups},
+            {"Mount", boolHomeAutoMount},
+            {"Options", arrHomeMountOptions}
+        }
+
 
         Dim arrShares As New NSArray()
         For Each shareRow In tableNetworkLocations.Rows
-            Dim dictShare As New NSDictionary()
 
-            If shareRow("UseNoMADDefaults") Then
-                dictShare.Add("AutoMount", boolDefaultsAutoMount)
-                dictShare.Add("ConnectedOnly", boolDefaultsConnectedOnly)
-            Else
-                dictShare.Add("AutoMount", shareRow("AutoMount"))
-                dictShare.Add("ConnectedOnly", shareRow("ConnectedOnly"))
-            End If
             Dim arrGroups As New NSArray()
             If tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName"))).Count() > 0 Then
                 For Each groupRow In tableFilterGroups.Select(String.Format("ShareName = '{0}'", shareRow("ShareName")))
                     arrGroups.Add(groupRow("GroupName").ToString().Substring(groupRow("GroupName").ToString().IndexOf("\") + 1))
                 Next
             End If
-            dictShare.Add("Groups", arrGroups)
-            dictShare.Add("Name", shareRow("ShareName"))
+
             Dim arrOptions As New NSArray()
             If shareRow("UseNoMADDefaults") Then
                 For Each strOption In arrDefaultsOptions.ToArray
@@ -992,17 +1002,34 @@ Public Class GroupPolicyNetworkLocations
                     Next
                 End If
             End If
-            dictShare.Add("Options", arrOptions)
-            dictShare.Add("URL", ConvertToSMB(shareRow("ShareTarget")))
+
+            Dim dictShare As New NSDictionary From {
+                {"Options", arrOptions},
+                {"URL", ConvertToSMB(shareRow("ShareTarget"))},
+                {"Groups", arrGroups},
+                {"Name", shareRow("ShareName")}
+            }
+            If shareRow("UseNoMADDefaults") Then
+                dictShare.Add("AutoMount", boolDefaultsAutoMount)
+                dictShare.Add("ConnectedOnly", boolDefaultsConnectedOnly)
+            Else
+                dictShare.Add("AutoMount", shareRow("AutoMount"))
+                dictShare.Add("ConnectedOnly", shareRow("ConnectedOnly"))
+            End If
 
             arrShares.Add(dictShare)
         Next
-        plistNoMADShares.Add("Shares", arrShares)
 
-        Dim SaveFileDialogNoMAD As New SaveFileDialog()
+        Dim plistNoMADShares As New NSDictionary From {
+            {"Version", "1"},
+            {"HomeMount", dictHomeMount},
+            {"Shares", arrShares}
+        }
 
-        SaveFileDialogNoMAD.Filter = "PLIST Files (*.plist)|*.plist|All Files (*.*)|*"
-        SaveFileDialogNoMAD.OverwritePrompt = True
+        Dim SaveFileDialogNoMAD As New SaveFileDialog With {
+            .Filter = "PLIST Files (*.plist)|*.plist|All Files (*.*)|*",
+            .OverwritePrompt = True
+        }
 
         If SaveFileDialogNoMAD.ShowDialog = DialogResult.OK Then
             PropertyListParser.SaveAsXml(plistNoMADShares, New FileInfo(SaveFileDialogNoMAD.FileName))
@@ -1174,11 +1201,12 @@ Public Class GroupPolicyNetworkLocations
     End Sub
 
     Private Function GetNetBiosName(ldapUrl As String) As String
-        Dim netbiosName As String
+        Dim netbiosName As String = ""
         Dim dirEntry As DirectoryEntry = New DirectoryEntry(ldapUrl)
 
-        Dim searcher As DirectorySearcher = New DirectorySearcher(dirEntry)
-        searcher.Filter = "netbiosname=*"
+        Dim searcher As DirectorySearcher = New DirectorySearcher(dirEntry) With {
+            .Filter = "netbiosname=*"
+        }
         searcher.PropertiesToLoad.Add("cn")
 
         Dim results As SearchResultCollection = searcher.FindAll()
