@@ -112,11 +112,11 @@ Public Class GroupPolicyNetworkLocations
         Dim column As DataColumn
 
         ' Creates a data table that looks something like this for storing variables related to the share folders
-        ' -----------------------------------------------------------------------------------------------------------------------------
-        ' |    ShareName    | ShareTarget | Last Modified | Ini1UID | Ini2UID | FoldersUID | ShortcutsUID | AutoMount | ConnectedOnly |
-        ' |-----------------|-------------|---------------|---------|---------|------------|--------------|-----------|---------------|
-        ' | * Unique String |   String    |   DateTime    | String  | String  |   String   |    String    |  Boolean  |    Boolean    |
-        ' -----------------------------------------------------------------------------------------------------------------------------
+        ' ------------------------------------------------------------------------------------------------------------------------------------------------
+        ' |    ShareName    | ShareTarget | Last Modified | Ini1UID | Ini2UID | FoldersUID | ShortcutsUID | UseNoMADDefaults | AutoMount | ConnectedOnly |
+        ' |-----------------|-------------|---------------|---------|---------|------------|--------------|------------------|-----------|---------------|
+        ' | * Unique String |   String    |   DateTime    | String  | String  |   String   |    String    |     Boolean      |  Boolean  |    Boolean    |
+        ' ------------------------------------------------------------------------------------------------------------------------------------------------
 
         column = New DataColumn()
         column.DataType = System.Type.GetType("System.String")
