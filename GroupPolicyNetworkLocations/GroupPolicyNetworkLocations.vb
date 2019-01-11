@@ -323,15 +323,7 @@ Public Class GroupPolicyNetworkLocations
             TextBoxLocationName.Text = rows(0)("ShareName").ToString
             TextBoxTargetPath.Text = rows(0)("ShareTarget").ToString
             CheckBoxUseNoMADDefaults.Checked = rows(0)("UseNoMADDefaults")
-            If rows(0)("UseNoMADDefaults") Then
-                ListBoxOptions.DataSource = Nothing
-                NoMADDefaultsEval()
-            Else
-                If rows(0)("AutoMount").GetType Is GetType(DBNull) Then rows(0)("AutoMount") = boolDefaultsAutoMount
-                If rows(0)("ConnectedOnly").GetType Is GetType(DBNull) Then rows(0)("ConnectedOnly") = boolDefaultsConnectedOnly
-                CheckBoxAutoMount.Checked = rows(0)("AutoMount")
-                CheckBoxConnectedOnly.Checked = rows(0)("ConnectedOnly")
-            End If
+            NoMADDefaultsEval()
 
         Else
             ' If no row is found, blank the form fields
@@ -803,6 +795,8 @@ Public Class GroupPolicyNetworkLocations
             ListBoxOptions.DisplayMember = "Option"
             ListBoxOptions.ValueMember = "Option"
             Dim row As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))(0)
+            If row("AutoMount").GetType Is GetType(DBNull) Then row("AutoMount") = boolDefaultsAutoMount
+            If row("ConnectedOnly").GetType Is GetType(DBNull) Then row("ConnectedOnly") = boolDefaultsConnectedOnly
             CheckBoxAutoMount.Checked = row("AutoMount")
             CheckBoxConnectedOnly.Checked = row("ConnectedOnly")
         End If
