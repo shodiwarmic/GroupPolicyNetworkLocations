@@ -118,11 +118,11 @@ Public Class GroupPolicyNetworkLocations
         Dim column As DataColumn
 
         ' Creates a data table that looks something like this for storing variables related to the share folders
-        ' ------------------------------------------------------------------------------------------------------------------------------------------------
-        ' |    ShareName    | ShareTarget | Last Modified | Ini1UID | Ini2UID | FoldersUID | ShortcutsUID | UseNoMADDefaults | AutoMount | ConnectedOnly |
-        ' |-----------------|-------------|---------------|---------|---------|------------|--------------|------------------|-----------|---------------|
-        ' | * Unique String |   String    |   DateTime    | String  | String  |   String   |    String    |     Boolean      |  Boolean  |    Boolean    |
-        ' ------------------------------------------------------------------------------------------------------------------------------------------------
+        ' -----------------------------------------------------------------------------------------------------------------------------------------------
+        ' |    ShareName    | ShareTarget | LastModified | Ini1UID | Ini2UID | FoldersUID | ShortcutsUID | UseNoMADDefaults | AutoMount | ConnectedOnly |
+        ' |-----------------|-------------|--------------|---------|---------|------------|--------------|------------------|-----------|---------------|
+        ' | * Unique String |   String    |   DateTime   | String  | String  |   String   |    String    |     Boolean      |  Boolean  |    Boolean    |
+        ' -----------------------------------------------------------------------------------------------------------------------------------------------
 
         column = New DataColumn()
         column.DataType = System.Type.GetType("System.String")
@@ -1010,6 +1010,7 @@ Public Class GroupPolicyNetworkLocations
         Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
         If rows.Count > 0 Then
             rows(0)("UseNoMADDefaults") = CheckBoxUseNoMADDefaults.Checked
+            rows(0)("LastModified") = Now
         End If
         NoMADDefaultsEval()
     End Sub
@@ -1028,6 +1029,10 @@ Public Class GroupPolicyNetworkLocations
                 optionRow("Option") = strOption
                 tableMountOptions.Rows.Add(optionRow)
             End Try
+            Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
+            If rows.Count > 0 Then
+                rows(0)("LastModified") = Now
+            End If
         End If
     End Sub
 
@@ -1036,6 +1041,7 @@ Public Class GroupPolicyNetworkLocations
             Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
             If rows.Count > 0 Then
                 rows(0)("AutoMount") = CheckBoxAutoMount.Checked
+                rows(0)("LastModified") = Now
             End If
         End If
     End Sub
@@ -1045,6 +1051,7 @@ Public Class GroupPolicyNetworkLocations
             Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
             If rows.Count > 0 Then
                 rows(0)("ConnectedOnly") = CheckBoxConnectedOnly.Checked
+                rows(0)("LastModified") = Now
             End If
         End If
     End Sub
@@ -1054,6 +1061,10 @@ Public Class GroupPolicyNetworkLocations
         Dim strOption As String = ListBoxOptions.SelectedValue.ToString
         Dim optionRow As DataRow = tableMountOptions.Select(String.Format("ShareName = '{0}' And Option = '{1}'", strShareName, strOption))(0)
         tableMountOptions.Rows.Remove(optionRow)
+        Dim rows() As DataRow = tableNetworkLocations.Select(String.Format("ShareName = '{0}'", ListBoxShareNames.SelectedValue.ToString))
+        If rows.Count > 0 Then
+            rows(0)("LastModified") = Now
+        End If
     End Sub
 
     Private Sub ButtonAddNewShare_Click(sender As Object, e As EventArgs) Handles ButtonAddNewShare.Click
