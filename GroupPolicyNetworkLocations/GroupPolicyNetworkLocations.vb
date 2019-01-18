@@ -97,7 +97,7 @@ Public Class GroupPolicyNetworkLocations
 
     ' Use the Active Directory domain that the computer is joined to
     Dim objDomain As ActiveDirectory.Domain = ActiveDirectory.Domain.GetComputerDomain()
-    Dim strDomainName As String = objDomain.Name
+    Friend strDomainName As String = objDomain.Name
 
     Dim regUserSettings As RegistryKey
     Dim XMLIniFiles, XMLFolders, XMLShortcuts As New XmlDocument()
@@ -627,7 +627,12 @@ Public Class GroupPolicyNetworkLocations
                 Dim strUID As String = Folder.Attributes("uid").Value
                 Dim timeModified As DateTime = Folder.Attributes("changed").Value
                 Dim strShareName As String = Folder.Attributes("name").Value
-                Dim strDescription As String = Folder.Attributes("desc").Value
+                Dim strDescription As String
+                Try
+                    strDescription = Folder.Attributes("desc").Value
+                Catch
+                    strDescription = ""
+                End Try
                 Dim rowNetLoc, rowGroup, rowOption As DataRow
                 ' Add data to row
                 Try
@@ -772,7 +777,7 @@ Public Class GroupPolicyNetworkLocations
         changesSaved = False
     End Sub
 
-    Private Sub RefreshPolicyList()
+    Friend Sub RefreshPolicyList()
         ' Remove any old polices from the table
         tableGroupPolicies.Clear()
 

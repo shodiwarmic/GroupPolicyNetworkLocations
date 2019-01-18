@@ -1,21 +1,24 @@
 ﻿Imports System.DirectoryServices
 Imports System.Windows.Forms
+Imports GPMGMTLib
+Imports System.IO
+Imports System.IO.Compression
 
 Public Class DialogSettings
 
-    Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
-        Me.DialogResult = System.Windows.Forms.DialogResult.OK
+    Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles OK_Button.Click
+        Me.DialogResult = DialogResult.OK
         Me.Close()
     End Sub
 
-    Private Sub Cancel_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Cancel_Button.Click
-        Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
+    Private Sub Cancel_Button_Click(ByVal sender As System.Object, ByVal e As EventArgs) Handles Cancel_Button.Click
+        Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
 
     Private Sub ComboBoxGroupPolicies_SelectedValueChanged(sender As Object, e As EventArgs) Handles ComboBoxGroupPolicies.SelectedValueChanged
         Try
-            If ComboBoxGroupPolicies.SelectedValue.GetType = System.Type.GetType("System.String") Then
+            If ComboBoxGroupPolicies.SelectedValue.GetType = Type.GetType("System.String") Then
                 TextBoxGroupPolicyUID.Text = ComboBoxGroupPolicies.SelectedValue.ToString
             End If
         Catch
@@ -24,8 +27,7 @@ Public Class DialogSettings
     End Sub
 
     Private Sub ButtonNoMADHomeSharesAddOption_Click(sender As Object, e As EventArgs) Handles ButtonNoMADHomeSharesAddOption.Click
-        Dim result As DialogResult = DialogAddOption.ShowDialog()
-        If result = DialogResult.OK Then
+        If DialogAddOption.ShowDialog() = DialogResult.OK Then
             Dim NewOption As String = DialogAddOption.ComboBoxOptionList.SelectedItem("Option").ToString
             If Not ListBoxNoMADHomeSharesOptions.Items.Contains(NewOption) Then
                 ListBoxNoMADHomeSharesOptions.Items.Add(NewOption)
@@ -34,8 +36,7 @@ Public Class DialogSettings
     End Sub
 
     Private Sub ButtonNoMADDefaultsAddOption_Click(sender As Object, e As EventArgs) Handles ButtonNoMADDefaultsAddOption.Click
-        Dim result As DialogResult = DialogAddOption.ShowDialog()
-        If result = DialogResult.OK Then
+        If DialogAddOption.ShowDialog() = DialogResult.OK Then
             Dim NewOption As String = DialogAddOption.ComboBoxOptionList.SelectedItem("Option").ToString
             If Not ListBoxNoMADDefaultsOptions.Items.Contains(NewOption) Then
                 ListBoxNoMADDefaultsOptions.Items.Add(NewOption)
@@ -73,6 +74,46 @@ Public Class DialogSettings
             ListBoxNoMADHomeSharesGroups.Items.Add("All")
         Else
             ListBoxNoMADHomeSharesGroups.Items.Remove("All")
+        End If
+    End Sub
+
+    Private Sub ButtonCreateNewPolicy_Click(sender As Object, e As EventArgs) Handles ButtonCreateNewPolicy.Click
+        If DialogNewPolicy.ShowDialog() = DialogResult.OK Then
+            Dim strGPOName As String = DialogNewPolicy.TextBoxPolicyName.Text
+            Dim strBackupID As String = "{81002162-2BD8-4088-9B10-A626FBF65A90}"
+
+            Dim gpm As New GPM
+            Dim gpc As GPMConstants = gpm.GetConstants
+            Dim gpd As GPMDomain = gpm.GetDomain(GroupPolicyNetworkLocations.strDomainName, "", gpc.UseAnyDC)
+
+            Dim policy As GPMGPO = gpd.CreateGPO()
+            policy.DisplayName = strGPOName
+
+            Dim strGPOBackupPath As String = Environment.GetEnvironmentVariable("TEMP") + "\NewGPO\"
+
+            If (Directory.Exists(strGPOBackupPath)) Then
+                Directory.Delete(strGPOBackupPath, True)
+                Do While Directory.Exists(strGPOBackupPath)
+                    Threading.Thread.Sleep(500)
+                Loop
+            End If
+
+            If (Not Directory.Exists(strGPOBackupPath)) Then
+                Directory.CreateDirectory(strGPOBackupPath)
+            End If
+
+            File.WriteAllBytes(strGPOBackupPath + "\SampleGPO.zip", My.Resources.SampleGPO)
+
+            ZipFile.ExtractToDirectory(strGPOBackupPath + "\SampleGPO.zip", strGPOBackupPath)
+
+            Dim policyBackupDir As GPMBackupDir = gpm.GetBackupDir(strGPOBackupPath + "\SampleGPO")
+            Dim policyBackup As GPMBackup = policyBackupDir.GetBackup(strBackupID)
+
+            policy.Import(0, policyBackup)
+
+            GroupPolicyNetworkLocations.RefreshPolicyList()
+
+            ComboBoxGroupPolicies.SelectedValue = policy.ID
         End If
     End Sub
 End Class
