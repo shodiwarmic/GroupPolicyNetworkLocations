@@ -37,18 +37,19 @@ Partial Class DialogSettings
         Me.ButtonNoMADHomeSharesDeleteOption = New System.Windows.Forms.Button()
         Me.ButtonNoMADHomeSharesAddOption = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.CheckBoxAllGroups = New System.Windows.Forms.CheckBox()
         Me.ButtonNoMADHomeSharesDeleteGroup = New System.Windows.Forms.Button()
         Me.ButtonNoMADHomeShareAddGroup = New System.Windows.Forms.Button()
         Me.ListBoxNoMADHomeSharesGroups = New System.Windows.Forms.ListBox()
         Me.CheckBoxNoMADHomeShareAutoMount = New System.Windows.Forms.CheckBox()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.CheckBoxNoMADDefaultsConnectedOnly = New System.Windows.Forms.CheckBox()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.ListBoxNoMADDefaultsOptions = New System.Windows.Forms.ListBox()
         Me.ButtonNoMADDefaultsDeleteOption = New System.Windows.Forms.Button()
         Me.ButtonNoMADDefaultsAddOption = New System.Windows.Forms.Button()
         Me.CheckBoxNoMADDefaultsAutoMount = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxNoMADDefaultsConnectedOnly = New System.Windows.Forms.CheckBox()
-        Me.CheckBoxAllGroups = New System.Windows.Forms.CheckBox()
+        Me.ButtonCreateNewPolicy = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
@@ -141,6 +142,7 @@ Partial Class DialogSettings
         '
         'TabPage1
         '
+        Me.TabPage1.Controls.Add(Me.ButtonCreateNewPolicy)
         Me.TabPage1.Controls.Add(Me.Label2)
         Me.TabPage1.Controls.Add(Me.Label1)
         Me.TabPage1.Controls.Add(Me.TextBoxGroupPolicyUID)
@@ -217,6 +219,16 @@ Partial Class DialogSettings
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Groups"
         '
+        'CheckBoxAllGroups
+        '
+        Me.CheckBoxAllGroups.AutoSize = True
+        Me.CheckBoxAllGroups.Location = New System.Drawing.Point(7, 15)
+        Me.CheckBoxAllGroups.Name = "CheckBoxAllGroups"
+        Me.CheckBoxAllGroups.Size = New System.Drawing.Size(74, 17)
+        Me.CheckBoxAllGroups.TabIndex = 3
+        Me.CheckBoxAllGroups.Text = "All Groups"
+        Me.CheckBoxAllGroups.UseVisualStyleBackColor = True
+        '
         'ButtonNoMADHomeSharesDeleteGroup
         '
         Me.ButtonNoMADHomeSharesDeleteGroup.Location = New System.Drawing.Point(104, 152)
@@ -267,6 +279,17 @@ Partial Class DialogSettings
         Me.TabPage3.Text = "NoMAD Defaults"
         Me.TabPage3.UseVisualStyleBackColor = True
         '
+        'CheckBoxNoMADDefaultsConnectedOnly
+        '
+        Me.CheckBoxNoMADDefaultsConnectedOnly.AutoSize = True
+        Me.CheckBoxNoMADDefaultsConnectedOnly.Location = New System.Drawing.Point(8, 29)
+        Me.CheckBoxNoMADDefaultsConnectedOnly.Name = "CheckBoxNoMADDefaultsConnectedOnly"
+        Me.CheckBoxNoMADDefaultsConnectedOnly.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.CheckBoxNoMADDefaultsConnectedOnly.Size = New System.Drawing.Size(102, 17)
+        Me.CheckBoxNoMADDefaultsConnectedOnly.TabIndex = 5
+        Me.CheckBoxNoMADDefaultsConnectedOnly.Text = "Connected Only"
+        Me.CheckBoxNoMADDefaultsConnectedOnly.UseVisualStyleBackColor = True
+        '
         'GroupBox3
         '
         Me.GroupBox3.Controls.Add(Me.ListBoxNoMADDefaultsOptions)
@@ -316,26 +339,14 @@ Partial Class DialogSettings
         Me.CheckBoxNoMADDefaultsAutoMount.Text = "Auto Mount"
         Me.CheckBoxNoMADDefaultsAutoMount.UseVisualStyleBackColor = True
         '
-        'CheckBoxNoMADDefaultsConnectedOnly
+        'ButtonCreateNewPolicy
         '
-        Me.CheckBoxNoMADDefaultsConnectedOnly.AutoSize = True
-        Me.CheckBoxNoMADDefaultsConnectedOnly.Location = New System.Drawing.Point(8, 29)
-        Me.CheckBoxNoMADDefaultsConnectedOnly.Name = "CheckBoxNoMADDefaultsConnectedOnly"
-        Me.CheckBoxNoMADDefaultsConnectedOnly.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.CheckBoxNoMADDefaultsConnectedOnly.Size = New System.Drawing.Size(102, 17)
-        Me.CheckBoxNoMADDefaultsConnectedOnly.TabIndex = 5
-        Me.CheckBoxNoMADDefaultsConnectedOnly.Text = "Connected Only"
-        Me.CheckBoxNoMADDefaultsConnectedOnly.UseVisualStyleBackColor = True
-        '
-        'CheckBoxAllGroups
-        '
-        Me.CheckBoxAllGroups.AutoSize = True
-        Me.CheckBoxAllGroups.Location = New System.Drawing.Point(7, 15)
-        Me.CheckBoxAllGroups.Name = "CheckBoxAllGroups"
-        Me.CheckBoxAllGroups.Size = New System.Drawing.Size(74, 17)
-        Me.CheckBoxAllGroups.TabIndex = 3
-        Me.CheckBoxAllGroups.Text = "All Groups"
-        Me.CheckBoxAllGroups.UseVisualStyleBackColor = True
+        Me.ButtonCreateNewPolicy.Location = New System.Drawing.Point(286, 60)
+        Me.ButtonCreateNewPolicy.Name = "ButtonCreateNewPolicy"
+        Me.ButtonCreateNewPolicy.Size = New System.Drawing.Size(113, 23)
+        Me.ButtonCreateNewPolicy.TabIndex = 5
+        Me.ButtonCreateNewPolicy.Text = "Create New Policy"
+        Me.ButtonCreateNewPolicy.UseVisualStyleBackColor = True
         '
         'DialogSettings
         '
@@ -395,4 +406,5 @@ Partial Class DialogSettings
     Friend WithEvents ButtonNoMADDefaultsAddOption As Button
     Friend WithEvents CheckBoxNoMADDefaultsAutoMount As CheckBox
     Friend WithEvents CheckBoxAllGroups As CheckBox
+    Friend WithEvents ButtonCreateNewPolicy As Button
 End Class
